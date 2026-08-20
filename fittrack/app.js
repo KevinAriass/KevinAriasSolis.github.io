@@ -44,19 +44,20 @@ const REWARDS = [
     { calories: 1000, emoji: '🍝', name: 'Pasta Alfredo', description: '~1000 cal' }
 ];
 
+
 const EXERCISES = [
-    { id: 'pushups', name: 'Push-ups', reps: '3 sets x 10 reps', category: 'Upper Body', calPerSet: 20 },
-    { id: 'squats', name: 'Squats', reps: '3 sets x 15 reps', category: 'Lower Body', calPerSet: 30 },
-    { id: 'plank', name: 'Plank', reps: '3 sets x 30 seconds', category: 'Core', calPerSet: 15 },
-    { id: 'lunges', name: 'Lunges', reps: '3 sets x 10 each leg', category: 'Lower Body', calPerSet: 28 },
-    { id: 'burpees', name: 'Burpees', reps: '3 sets x 8 reps', category: 'Full Body', calPerSet: 40 },
-    { id: 'mountain_climbers', name: 'Mountain Climbers', reps: '3 sets x 20 reps', category: 'Cardio', calPerSet: 30 },
-    { id: 'crunches', name: 'Crunches', reps: '3 sets x 15 reps', category: 'Core', calPerSet: 15 },
-    { id: 'jumping_jacks', name: 'Jumping Jacks', reps: '3 sets x 20 reps', category: 'Cardio', calPerSet: 25 },
-    { id: 'tricep_dips', name: 'Tricep Dips (chair)', reps: '3 sets x 10 reps', category: 'Upper Body', calPerSet: 20 },
-    { id: 'glute_bridge', name: 'Glute Bridge', reps: '3 sets x 15 reps', category: 'Lower Body', calPerSet: 22 },
-    { id: 'superman', name: 'Superman Hold', reps: '3 sets x 10 reps', category: 'Core', calPerSet: 18 },
-    { id: 'high_knees', name: 'High Knees', reps: '3 sets x 30 seconds', category: 'Cardio', calPerSet: 35 }
+    { id: 'pushups', name: 'Push-ups', reps: '3 sets x 10 reps', category: 'Upper Body', calPerSet: 20, video: 'https://www.youtube.com/shorts/IODxDxX7oi4' },
+    { id: 'squats', name: 'Squats', reps: '3 sets x 15 reps', category: 'Lower Body', calPerSet: 30, video: 'https://www.youtube.com/shorts/YaXPRqUwItQ' },
+    { id: 'plank', name: 'Plank', reps: '3 sets x 30 seconds', category: 'Core', calPerSet: 15, video: 'https://www.youtube.com/shorts/yeKv5oX_6GY' },
+    { id: 'lunges', name: 'Lunges', reps: '3 sets x 10 each leg', category: 'Lower Body', calPerSet: 28, video: 'https://www.youtube.com/shorts/QOVaHwm-Q6U' },
+    { id: 'burpees', name: 'Burpees', reps: '3 sets x 8 reps', category: 'Full Body', calPerSet: 40, video: 'https://www.youtube.com/shorts/dZgVxmf6jkA' },
+    { id: 'mountain_climbers', name: 'Mountain Climbers', reps: '3 sets x 20 reps', category: 'Cardio', calPerSet: 30, video: 'https://www.youtube.com/shorts/nmwgirgXLYM' },
+    { id: 'crunches', name: 'Crunches', reps: '3 sets x 15 reps', category: 'Core', calPerSet: 15, video: 'https://www.youtube.com/shorts/1fbU_MkV7NE' },
+    { id: 'jumping_jacks', name: 'Jumping Jacks', reps: '3 sets x 20 reps', category: 'Cardio', calPerSet: 25, video: 'https://www.youtube.com/shorts/CWpmIW6l-YA' },
+    { id: 'tricep_dips', name: 'Tricep Dips (chair)', reps: '3 sets x 10 reps', category: 'Upper Body', calPerSet: 20, video: 'https://www.youtube.com/shorts/6kALZikXxLc' },
+    { id: 'glute_bridge', name: 'Glute Bridge', reps: '3 sets x 15 reps', category: 'Lower Body', calPerSet: 22, video: 'https://www.youtube.com/shorts/OUgsJ8-Vi0E' },
+    { id: 'superman', name: 'Superman Hold', reps: '3 sets x 10 reps', category: 'Core', calPerSet: 18, video: 'https://www.youtube.com/shorts/z6PJMT2y8GQ' },
+    { id: 'high_knees', name: 'High Knees', reps: '3 sets x 30 seconds', category: 'Cardio', calPerSet: 35, video: 'https://www.youtube.com/shorts/tx5rgpDAJRI' }
 ];
 
 const MOOD_OPTIONS = [
@@ -284,6 +285,7 @@ function renderTodayView(container) {
         html += '<div class="exercise-card ' + (isCompleted ? 'completed' : '') + '" data-exercise-id="' + exercise.id + '">';
         html += '<div class="exercise-checkbox"><span class="exercise-check-icon">✓</span></div>';
         html += '<div class="exercise-info"><div class="exercise-name">' + exercise.name + '</div><div class="exercise-detail">' + exercise.reps + ' • ' + exercise.calPerSet + ' cal</div></div>';
+        html += '<a href="' + exercise.video + '" target="_blank" class="exercise-video-btn" onclick="event.stopPropagation()">▶</a>';
         if (isCompleted) html += '<div class="exercise-time">' + dayData.exercises[exercise.id] + '</div>';
         html += '</div>';
     });
