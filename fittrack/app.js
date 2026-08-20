@@ -193,6 +193,11 @@ function showApp() {
     document.getElementById('app').classList.remove('hidden');
     initNavigation();
     setTodayDate();
+    // Show user email in header
+    var logoutBtn = document.getElementById('btnLogout');
+    if (currentUser && currentUser.email) {
+        logoutBtn.textContent = 'Logout (' + currentUser.email.split('@') + ')';
+    }
 }
 
 // === Firestore Data ===
