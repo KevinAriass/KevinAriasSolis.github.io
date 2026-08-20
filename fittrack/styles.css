@@ -1388,8 +1388,10 @@ select.auth-input {
     border-radius: var(--radius-md);
     border: 1px solid var(--border-subtle);
     margin-bottom: 16px;
-    min-height: 140px;
+    height: 160px;
     gap: 4px;
+    overflow: hidden;
+    -webkit-box-align: end;
 }
 
 .weight-bar-group {
@@ -1413,6 +1415,8 @@ select.auth-input {
     border-radius: 4px 4px 0 0;
     min-height: 20px;
     transition: height 0.3s ease;
+    -webkit-flex-shrink: 0;
+    flex-shrink: 0;
 }
 
 .weight-bar-date {
