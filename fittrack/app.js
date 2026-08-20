@@ -294,6 +294,16 @@ function saveWorkout() { if (!currentUser) return; let today = getTodayKey(); if
 function saveWellness() { if (!currentUser) return; let today = getTodayKey(); if (wellnessData[today]) db.collection('users').doc(currentUser.uid).collection('wellness').doc(today).set(wellnessData[today]).catch(function() {}); }
 function saveProfile() { if (!currentUser) return; db.collection('users').doc(currentUser.uid).set(profileData, { merge: true }).catch(function() {}); }
 function saveWeight(weight, date) { if (!currentUser) return; let entry = { weight: weight, date: date, timestamp: new Date().toISOString() }; db.collection('users').doc(currentUser.uid).collection('weightLog').doc(date).set(entry).then(function() { let i = weightHistory.findIndex(function(w) { return w.date === date; }); if (i > -1) weightHistory[i] = entry; else { weightHistory.push(entry); weightHistory.sort(function(a, b) { return a.date.localeCompare(b.date); }); } }).catch(function() {}); }
+function loadLeaderboard() {
+    db.collection('leaderboard').orderBy('streak', 'desc').limit(20).get().then(function(snap) { leaderboardData = []; snap.forEach(function(doc) { leaderboardData.push(doc.data()); }); }).catch(function() { leaderboardData = []; });
+}
+
+function updateLeaderboard() {
+    if (!currentUser) return;
+    var streak = calculateStreak();
+    var entry = { uid: currentUser.uid, displayName: currentUser.email.split('@'), streak: streak, lastUpdated: new Date().toISOString() };
+    db.collection('leaderboard').doc(currentUser.uid).set(entry).then(function() { loadLeaderboard(); }).catch(function() {});
+}
 
 // === Navigation ===
 function setTodayDate() { let today = new Date(); document.getElementById('todayDate').textContent = today.toLocaleDateString(currentLang === 'es' ? 'es-ES' : 'en-US', { weekday: 'long', day: 'numeric', month: 'short' }); }
