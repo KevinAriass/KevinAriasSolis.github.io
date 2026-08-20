@@ -23,13 +23,44 @@
         </div>
     </div>
 
+    <!-- Auth Screen -->
+    <div id="authScreen" class="auth-screen hidden">
+        <div class="auth-container">
+            <div class="auth-header">
+                <div class="auth-icon">💪</div>
+                <h1 class="auth-title">FitTrack</h1>
+                <p class="auth-subtitle">Sign in to sync your progress</p>
+            </div>
+
+            <div id="authError" class="auth-error hidden"></div>
+
+            <form id="authForm" class="auth-form">
+                <div class="auth-input-group">
+                    <label class="auth-label">Email</label>
+                    <input type="email" id="authEmail" class="auth-input" placeholder="your@email.com" required>
+                </div>
+                <div class="auth-input-group">
+                    <label class="auth-label">Password</label>
+                    <input type="password" id="authPassword" class="auth-input" placeholder="Min 6 characters" required>
+                </div>
+                <button type="submit" id="btnLogin" class="btn btn-primary auth-btn">Login</button>
+                <button type="button" id="btnRegister" class="btn btn-secondary auth-btn">Create Account</button>
+            </form>
+
+            <p class="auth-footer">Your data syncs across all devices</p>
+        </div>
+    </div>
+
     <!-- Main App -->
     <div id="app" class="app hidden">
         <!-- Header -->
         <header class="header">
             <div class="header-content">
                 <h1 class="header-title">💪 FitTrack</h1>
-                <p class="header-subtitle" id="todayDate"></p>
+                <div class="header-right">
+                    <p class="header-subtitle" id="todayDate"></p>
+                    <button class="logout-btn" id="btnLogout">Logout</button>
+                </div>
             </div>
         </header>
 
@@ -58,6 +89,10 @@
         </nav>
     </div>
 
+    <!-- Firebase SDK (CDN - no npm needed) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
