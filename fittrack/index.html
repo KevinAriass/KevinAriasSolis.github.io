@@ -3,75 +3,70 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="FitTrack">
     <meta name="theme-color" content="#0f1a14">
+    <title>FitTrack</title>
+    <link rel="stylesheet" href="styles.css">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon-192.png">
-    <title>FitTrack - Daily Workout</title>
-    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <!-- Splash Screen -->
-    <div id="splashScreen" class="splash-screen">
+    <div class="splash-screen" id="splashScreen">
         <div class="splash-content">
             <div class="splash-icon">💪</div>
-            <h1 class="splash-title">FitTrack</h1>
-            <p class="splash-subtitle">Daily Workout Tracker</p>
+            <div class="splash-title">FitTrack</div>
+            <div class="splash-subtitle">Daily Workout Tracker</div>
         </div>
     </div>
 
     <!-- Auth Screen -->
-    <div id="authScreen" class="auth-screen hidden">
+    <div class="auth-screen" id="authScreen">
         <div class="auth-container">
             <div class="auth-header">
-                <div class="auth-icon">💪</div>
-                <h1 class="auth-title">FitTrack</h1>
-                <p class="auth-subtitle">Sign in to sync your progress</p>
+                <div class="auth-icon">💪🔒</div>
+                <div class="auth-title">FitTrack</div>
+                <div class="auth-subtitle">Sign in to sync your progress</div>
             </div>
-
-            <div id="authError" class="auth-error hidden"></div>
-
-            <form id="authForm" class="auth-form">
+            <div class="auth-error hidden" id="authError"></div>
+            <form class="auth-form" id="authForm">
                 <div class="auth-input-group">
-                    <label class="auth-label">Email</label>
-                    <input type="email" id="authEmail" class="auth-input" placeholder="your@email.com" required>
+                    <label class="auth-label">EMAIL</label>
+                    <input type="email" class="auth-input" id="authEmail" placeholder="your@email.com" autocomplete="email">
                 </div>
                 <div class="auth-input-group">
-                    <label class="auth-label">Password</label>
-                    <input type="password" id="authPassword" class="auth-input" placeholder="Min 6 characters" required>
+                    <label class="auth-label">PASSWORD</label>
+                    <input type="password" class="auth-input" id="authPassword" placeholder="Min. 6 characters" autocomplete="current-password">
                 </div>
-                <button type="submit" id="btnLogin" class="btn btn-primary auth-btn">Login</button>
-                <button type="button" id="btnRegister" class="btn btn-secondary auth-btn">Create Account</button>
+                <button type="submit" class="btn btn-primary auth-btn">LOGIN</button>
+                <button type="button" class="btn btn-secondary auth-btn" id="btnRegister">CREATE ACCOUNT</button>
             </form>
-
-            <p class="auth-footer">Your data syncs across all devices</p>
+            <div class="auth-footer">Your data syncs across all devices</div>
         </div>
     </div>
 
     <!-- Main App -->
-    <div id="app" class="app hidden">
+    <div class="app hidden" id="app">
         <!-- Header -->
         <header class="header">
             <div class="header-content">
-                <h1 class="header-title">💪 FitTrack</h1>
+                <div class="header-title">FitTrack</div>
                 <div class="header-right">
-                    <p class="header-subtitle" id="todayDate"></p>
+                    <span class="header-subtitle" id="todayDate"></span>
                     <button class="logout-btn" id="btnLogout">Logout</button>
                 </div>
             </div>
         </header>
 
         <!-- Content -->
-        <main id="content" class="content">
-        </main>
+        <main class="content" id="content"></main>
 
         <!-- Bottom Navigation - 5 tabs -->
         <nav class="bottom-nav">
             <button class="nav-btn active" data-view="today">
-                <span class="nav-icon">🏠</span>
+                <span class="nav-icon">📋</span>
                 <span class="nav-label">Today</span>
             </button>
             <button class="nav-btn" data-view="calendar">
@@ -94,9 +89,9 @@
     </div>
 
     <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
