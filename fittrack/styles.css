@@ -1607,3 +1607,107 @@ input[type="date"].auth-input::-webkit-calendar-picker-indicator {
     transform: scale(0.9);
 }
 
+
+/* === Exercise Video Button === */
+.exercise-video-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--green-glow);
+    border: 1.5px solid var(--green-primary);
+    color: var(--green-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+}
+
+.exercise-video-btn:active {
+    background: var(--green-primary);
+    color: white;
+    transform: scale(0.9);
+}
+
+/* === Video Modal === */
+.video-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.video-modal.active {
+    opacity: 1;
+}
+
+.video-modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+}
+
+.video-modal-content {
+    position: relative;
+    width: 90%;
+    max-width: 400px;
+    z-index: 10001;
+    animation: fadeInUp 0.3s ease;
+}
+
+.video-modal-close {
+    position: absolute;
+    top: -40px;
+    right: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-primary);
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.video-modal-close:active {
+    background: var(--red-bg);
+    color: var(--red);
+    transform: scale(0.9);
+}
+
+.video-modal-player {
+    position: relative;
+    width: 100%;
+    padding-bottom: 177%;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: #000;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.video-modal-player iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+
