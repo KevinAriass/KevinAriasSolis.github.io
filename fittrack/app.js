@@ -510,11 +510,11 @@ function renderStatsView(container) {
 
         let recentWeights = weightHistory.slice(-10); // Last 10 entries
         recentWeights.forEach(function(entry) {
-            let height = ((entry.weight - minWeight) / range) * 60 + 20;
+            let height = Math.round(((entry.weight - minWeight) / range) * 60 + 30);
             let dateLabel = formatDateShort(entry.date);
             html += '<div class="weight-bar-group">';
             html += '<div class="weight-bar-value">' + entry.weight + '</div>';
-            html += '<div class="weight-bar" style="height: ' + height + 'px"></div>';
+            html += '<div class="weight-bar" style="height: ' + height + 'px; min-height: ' + height + 'px; max-height: ' + height + 'px;"></div>';
             html += '<div class="weight-bar-date">' + dateLabel + '</div>';
             html += '</div>';
         });
