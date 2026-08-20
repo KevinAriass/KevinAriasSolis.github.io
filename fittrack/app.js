@@ -79,6 +79,7 @@ document.addEventListener('DOMContentLoaded', function() {
 function initSplashScreen() {
     setTimeout(function() {
         document.getElementById('splashScreen').classList.add('hidden');
+        // Auth screen will be shown by onAuthStateChanged
     }, 1500);
 }
 
