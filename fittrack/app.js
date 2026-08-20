@@ -280,7 +280,11 @@ function loadAllData() {
 }
 
 function loadLeaderboard() {
-    db.collection('leaderboard').orderBy('streak', 'desc').limit(20).get().then(function(snap) { leaderboardData = []; snap.forEach(function(doc) { leaderboardData.push(doc.data()); }); }).catch(function() { leaderboardData = []; });
+    db.collection('leaderboard').orderBy('streak', 'desc').limit(20).onSnapshot(function(snap) {
+        leaderboardData = [];
+        snap.forEach(function(doc) { leaderboardData.push(doc.data()); });
+        if (currentView === 'stats') { renderCurrentView(); }
+    }, function(err) { console.log('Leaderboard error:', err); leaderboardData = []; });
 }
 
 function updateLeaderboard() {
