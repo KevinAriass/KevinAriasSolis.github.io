@@ -1,7 +1,7 @@
 
 // ============================================
-// FITTRACK PWA - DAILY WORKOUT TRACKER v4
-// Firebase + Wellness + Profile + Weight + Trends + Videos
+// FITTRACK PWA - DAILY WORKOUT TRACKER v5
+// Firebase + Wellness + Profile + Weight + Trends + GIFs
 // ============================================
 
 // === Firebase Configuration ===
@@ -42,18 +42,18 @@ const REWARDS = [
 ];
 
 const EXERCISES = [
-    { id: 'pushups', name: 'Push-ups', reps: '3 sets x 10 reps', category: 'Upper Body', calPerSet: 20, video: 'https://www.youtube.com/shorts/IODxDxX7oi4' },
-    { id: 'squats', name: 'Squats', reps: '3 sets x 15 reps', category: 'Lower Body', calPerSet: 30, video: 'https://www.youtube.com/shorts/YaXPRqUwItQ' },
-    { id: 'plank', name: 'Plank', reps: '3 sets x 30 seconds', category: 'Core', calPerSet: 15, video: 'https://www.youtube.com/shorts/yeKv5oX_6GY' },
-    { id: 'lunges', name: 'Lunges', reps: '3 sets x 10 each leg', category: 'Lower Body', calPerSet: 28, video: 'https://www.youtube.com/shorts/QOVaHwm-Q6U' },
-    { id: 'burpees', name: 'Burpees', reps: '3 sets x 8 reps', category: 'Full Body', calPerSet: 40, video: 'https://www.youtube.com/shorts/dZgVxmf6jkA' },
-    { id: 'mountain_climbers', name: 'Mountain Climbers', reps: '3 sets x 20 reps', category: 'Cardio', calPerSet: 30, video: 'https://www.youtube.com/shorts/nmwgirgXLYM' },
-    { id: 'crunches', name: 'Crunches', reps: '3 sets x 15 reps', category: 'Core', calPerSet: 15, video: 'https://www.youtube.com/shorts/1fbU_MkV7NE' },
-    { id: 'jumping_jacks', name: 'Jumping Jacks', reps: '3 sets x 20 reps', category: 'Cardio', calPerSet: 25, video: 'https://www.youtube.com/shorts/CWpmIW6l-YA' },
-    { id: 'tricep_dips', name: 'Tricep Dips (chair)', reps: '3 sets x 10 reps', category: 'Upper Body', calPerSet: 20, video: 'https://www.youtube.com/shorts/6kALZikXxLc' },
-    { id: 'glute_bridge', name: 'Glute Bridge', reps: '3 sets x 15 reps', category: 'Lower Body', calPerSet: 22, video: 'https://www.youtube.com/shorts/OUgsJ8-Vi0E' },
-    { id: 'superman', name: 'Superman Hold', reps: '3 sets x 10 reps', category: 'Core', calPerSet: 18, video: 'https://www.youtube.com/shorts/z6PJMT2y8GQ' },
-    { id: 'high_knees', name: 'High Knees', reps: '3 sets x 30 seconds', category: 'Cardio', calPerSet: 35, video: 'https://www.youtube.com/shorts/tx5rgpDAJRI' }
+    { id: 'pushups', name: 'Push-ups', reps: '3 sets x 10 reps', category: 'Upper Body', calPerSet: 20, gif: 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Push-Up.gif' },
+    { id: 'squats', name: 'Squats', reps: '3 sets x 15 reps', category: 'Lower Body', calPerSet: 30, gif: 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Barbell-Squat.gif' },
+    { id: 'plank', name: 'Plank', reps: '3 sets x 30 seconds', category: 'Core', calPerSet: 15, gif: 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Front-Plank.gif' },
+    { id: 'lunges', name: 'Lunges', reps: '3 sets x 10 each leg', category: 'Lower Body', calPerSet: 28, gif: 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Bodyweight-Walking-Lunge.gif' },
+    { id: 'burpees', name: 'Burpees', reps: '3 sets x 8 reps', category: 'Full Body', calPerSet: 40, gif: 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Burpee.gif' },
+    { id: 'mountain_climbers', name: 'Mountain Climbers', reps: '3 sets x 20 reps', category: 'Cardio', calPerSet: 30, gif: 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Mountain-Climber.gif' },
+    { id: 'crunches', name: 'Crunches', reps: '3 sets x 15 reps', category: 'Core', calPerSet: 15, gif: 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Crunch.gif' },
+    { id: 'jumping_jacks', name: 'Jumping Jacks', reps: '3 sets x 20 reps', category: 'Cardio', calPerSet: 25, gif: 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Jumping-Jack.gif' },
+    { id: 'tricep_dips', name: 'Tricep Dips (chair)', reps: '3 sets x 10 reps', category: 'Upper Body', calPerSet: 20, gif: 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Bench-Dip.gif' },
+    { id: 'glute_bridge', name: 'Glute Bridge', reps: '3 sets x 15 reps', category: 'Lower Body', calPerSet: 22, gif: 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Glute-Bridge.gif' },
+    { id: 'superman', name: 'Superman Hold', reps: '3 sets x 10 reps', category: 'Core', calPerSet: 18, gif: 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Superman.gif' },
+    { id: 'high_knees', name: 'High Knees', reps: '3 sets x 30 seconds', category: 'Cardio', calPerSet: 35, gif: 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Run-in-Place.gif' }
 ];
 
 const MOOD_OPTIONS = [
@@ -281,7 +281,7 @@ function renderTodayView(container) {
         html += '<div class="exercise-checkbox"><span class="exercise-check-icon">✓</span></div>';
         html += '<div class="exercise-info"><div class="exercise-name">' + exercise.name + '</div><div class="exercise-detail">' + exercise.reps + ' • ' + exercise.calPerSet + ' cal</div></div>';
         if (isCompleted) html += '<div class="exercise-time">' + dayData.exercises[exercise.id] + '</div>';
-        html += '<button class="exercise-video-btn" data-video="' + exercise.video + '">▶</button>';
+        html += '<button class="exercise-video-btn" data-gif="' + exercise.gif + '">▶</button>';
         html += '</div>';
     });
 
@@ -307,12 +307,12 @@ function renderTodayView(container) {
         });
     });
 
-    // Video button listeners
+    // GIF button listeners
     container.querySelectorAll('.exercise-video-btn').forEach(function(btn) {
         btn.addEventListener('click', function(e) {
             e.stopPropagation();
-            let videoUrl = btn.getAttribute('data-video');
-            openVideoModal(videoUrl);
+            let gifUrl = btn.getAttribute('data-gif');
+            openGifModal(gifUrl);
         });
     });
 }
@@ -467,7 +467,6 @@ function renderWellnessView(container) {
 // === STATS VIEW (with Trends) ===
 function renderStatsView(container) {
     let days = Object.keys(appData);
-    let totalDays = days.length;
     let completedDays = days.filter(function(d) { return appData[d].jumpCompleted; }).length;
     let totalJumps = days.reduce(function(sum, d) { return sum + (appData[d].jumpCount || 0); }, 0);
     let totalExercises = days.reduce(function(sum, d) { return sum + (appData[d].exercises ? Object.keys(appData[d].exercises).length : 0); }, 0);
@@ -500,7 +499,6 @@ function renderStatsView(container) {
         html += '<div class="trend-change" style="color: ' + diffColor + '"><div class="trend-change-number">' + arrow + ' ' + diffSign + diff + ' kg</div><div class="trend-change-label">Since ' + formatDateShort(first.date) + '</div></div>';
         html += '</div>';
 
-        // Weight chart
         html += '<div class="weight-chart">';
         let maxWeight = Math.max.apply(null, weightHistory.map(function(w) { return w.weight; }));
         let minWeight = Math.min.apply(null, weightHistory.map(function(w) { return w.weight; }));
@@ -709,33 +707,25 @@ function renderProfileView(container) {
     document.getElementById('btnLogoutProfile').addEventListener('click', function() { auth.signOut(); });
 }
 
-// === Video Modal ===
-function openVideoModal(url) {
-    let videoId = '';
-    if (url.indexOf('shorts/') > -1) {
-        videoId = url.split('shorts/')[1].split('?')[0];
-    } else if (url.indexOf('v=') > -1) {
-        videoId = url.split('v=')[1].split('&')[0];
-    }
-
+// === GIF Modal ===
+function openGifModal(gifUrl) {
     let modal = document.createElement('div');
     modal.className = 'video-modal';
     modal.innerHTML = '<div class="video-modal-overlay"></div>' +
         '<div class="video-modal-content">' +
         '<button class="video-modal-close">✕</button>' +
-        '<div class="video-modal-player">' +
-        '<iframe src="https://www.youtube.com/embed/' + videoId + '?autoplay=1&rel=0&modestbranding=1" ' +
-        'frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>' +
+        '<div class="gif-modal-player">' +
+        '<img src="' + gifUrl + '" alt="Exercise demo" class="gif-modal-img">' +
         '</div></div>';
 
     document.body.appendChild(modal);
     setTimeout(function() { modal.classList.add('active'); }, 10);
 
-    modal.querySelector('.video-modal-overlay').addEventListener('click', function() { closeVideoModal(modal); });
-    modal.querySelector('.video-modal-close').addEventListener('click', function() { closeVideoModal(modal); });
+    modal.querySelector('.video-modal-overlay').addEventListener('click', function() { closeGifModal(modal); });
+    modal.querySelector('.video-modal-close').addEventListener('click', function() { closeGifModal(modal); });
 }
 
-function closeVideoModal(modal) {
+function closeGifModal(modal) {
     modal.classList.remove('active');
     setTimeout(function() { modal.remove(); }, 300);
 }
