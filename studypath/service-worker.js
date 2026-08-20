@@ -6,13 +6,13 @@
 
 const CACHE_NAME = 'studypath-v1';
 const ASSETS_TO_CACHE = [
-    '/studypath/',
-    '/studypath/index.html',
-    '/studypath/styles.css',
-    '/studypath/app.js',
-    '/studypath/manifest.json',
-    '/studypath/icon-192.png',
-    '/studypath/icon-512.png'
+    '/KevinAriasSolis.github.io/studypath/',
+    '/KevinAriasSolis.github.io/studypath/index.html',
+    '/KevinAriasSolis.github.io/studypath/styles.css',
+    '/KevinAriasSolis.github.io/studypath/app.js',
+    '/KevinAriasSolis.github.io/studypath/manifest.json',
+    '/KevinAriasSolis.github.io/studypath/icon-192.png',
+    '/KevinAriasSolis.github.io/studypath/icon-512.png'
 ];
 
 // Instalar - cachear archivos
