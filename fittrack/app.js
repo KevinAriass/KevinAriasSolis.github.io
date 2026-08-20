@@ -115,9 +115,19 @@ function initAuth() {
 }
 
 function loginUser() {
-    var email = document.getElementById('authEmail').value;
+    var email = document.getElementById('authEmail').value.trim();
     var password = document.getElementById('authPassword').value;
     hideAuthError();
+
+    if (!email) {
+        showAuthError('Please enter your email');
+        return;
+    }
+
+    if (!password) {
+        showAuthError('Please enter your password');
+        return;
+    }
 
     auth.signInWithEmailAndPassword(email, password)
         .catch(function(error) {
