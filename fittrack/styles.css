@@ -1730,3 +1730,134 @@ input[type="date"].auth-input::-webkit-calendar-picker-indicator {
 }
 
 
+/* === Month Set Badge === */
+.month-set-badge {
+    text-align: center;
+    padding: 8px 16px;
+    background: var(--green-glow);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    color: var(--green-primary);
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 16px;
+}
+
+/* === Exercise Info Modal === */
+.exercise-modal-content {
+    max-height: 85vh;
+    overflow-y: auto;
+}
+
+.exercise-modal-body {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    padding: 24px 20px;
+    border: 1px solid var(--border-subtle);
+}
+
+.exercise-modal-emoji {
+    text-align: center;
+    font-size: 48px;
+    margin-bottom: 12px;
+}
+
+.exercise-modal-name {
+    text-align: center;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.exercise-modal-category {
+    text-align: center;
+    font-size: 13px;
+    color: var(--green-primary);
+    font-weight: 500;
+    margin-bottom: 20px;
+    padding: 4px 12px;
+    background: var(--green-glow);
+    border-radius: 20px;
+    display: inline-block;
+    margin-left: auto;
+    margin-right: auto;
+    width: fit-content;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: fit-content;
+}
+
+.exercise-modal-section-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-top: 16px;
+    margin-bottom: 10px;
+}
+
+.exercise-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.exercise-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.step-number {
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    border-radius: 50%;
+    background: var(--green-primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.step-text {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    padding-top: 2px;
+}
+
+.exercise-modal-muscles {
+    font-size: 14px;
+    color: var(--text-secondary);
+    padding: 8px 12px;
+    background: var(--bg-elevated);
+    border-radius: var(--radius-sm);
+    border-left: 3px solid var(--green-primary);
+}
+
+.exercise-modal-tip {
+    font-size: 14px;
+    color: var(--text-secondary);
+    padding: 8px 12px;
+    background: rgba(255, 193, 7, 0.1);
+    border-radius: var(--radius-sm);
+    border-left: 3px solid #ffc107;
+    font-style: italic;
+}
+
+.exercise-modal-reps {
+    text-align: center;
+    margin-top: 20px;
+    padding: 12px;
+    background: var(--green-glow);
+    border-radius: var(--radius-md);
+    color: var(--green-primary);
+    font-weight: 600;
+    font-size: 14px;
+}
+
+
