@@ -1,7 +1,7 @@
 
 // ============================================
 // FITTRACK PWA - DAILY WORKOUT TRACKER v4
-// Firebase + Wellness + Profile + Weight + Trends
+// Firebase + Wellness + Profile + Weight + Trends + Videos
 // ============================================
 
 // === Firebase Configuration ===
@@ -18,10 +18,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
-
-db.enablePersistence().catch(function(err) {
-    console.log('Persistence:', err.code);
-});
+db.settings({ cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED });
 
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('service-worker.js').catch(function(err) {
@@ -43,7 +40,6 @@ const REWARDS = [
     { calories: 900, emoji: '🎂', name: 'Slice of cake', description: '~900 cal' },
     { calories: 1000, emoji: '🍝', name: 'Pasta Alfredo', description: '~1000 cal' }
 ];
-
 
 const EXERCISES = [
     { id: 'pushups', name: 'Push-ups', reps: '3 sets x 10 reps', category: 'Upper Body', calPerSet: 20, video: 'https://www.youtube.com/shorts/IODxDxX7oi4' },
@@ -205,7 +201,6 @@ function saveWeight(weight, date) {
     let entry = { weight: weight, date: date, timestamp: new Date().toISOString() };
     db.collection('users').doc(currentUser.uid).collection('weightLog').doc(date).set(entry)
         .then(function() {
-            // Update local array
             let existing = weightHistory.findIndex(function(w) { return w.date === date; });
             if (existing > -1) weightHistory[existing] = entry;
             else { weightHistory.push(entry); weightHistory.sort(function(a, b) { return a.date.localeCompare(b.date); }); }
@@ -285,8 +280,8 @@ function renderTodayView(container) {
         html += '<div class="exercise-card ' + (isCompleted ? 'completed' : '') + '" data-exercise-id="' + exercise.id + '">';
         html += '<div class="exercise-checkbox"><span class="exercise-check-icon">✓</span></div>';
         html += '<div class="exercise-info"><div class="exercise-name">' + exercise.name + '</div><div class="exercise-detail">' + exercise.reps + ' • ' + exercise.calPerSet + ' cal</div></div>';
-        html += '<a href="' + exercise.video + '" target="_blank" class="exercise-video-btn" onclick="event.stopPropagation()">▶</a>';
         if (isCompleted) html += '<div class="exercise-time">' + dayData.exercises[exercise.id] + '</div>';
+        html += '<button class="exercise-video-btn" data-video="' + exercise.video + '">▶</button>';
         html += '</div>';
     });
 
@@ -309,6 +304,15 @@ function renderTodayView(container) {
         card.querySelector('.exercise-checkbox').addEventListener('click', function() {
             toggleExercise(card.getAttribute('data-exercise-id'));
             renderCurrentView();
+        });
+    });
+
+    // Video button listeners
+    container.querySelectorAll('.exercise-video-btn').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            let videoUrl = btn.getAttribute('data-video');
+            openVideoModal(videoUrl);
         });
     });
 }
@@ -374,7 +378,6 @@ function renderWellnessView(container) {
     html += '<div class="section-title-main">🧠 Daily Wellness Check</div>';
     html += '<p class="section-subtitle">How are you feeling today?</p>';
 
-    // Mood
     html += '<div class="wellness-card"><div class="wellness-card-title">😊 Mood</div><div class="mood-grid">';
     MOOD_OPTIONS.forEach(function(mood) {
         let selected = data.mood === mood.id ? ' selected' : '';
@@ -382,27 +385,22 @@ function renderWellnessView(container) {
     });
     html += '</div></div>';
 
-    // Energy
     html += '<div class="wellness-card"><div class="wellness-card-title">⚡ Energy Level</div>';
     html += '<div class="slider-container"><input type="range" class="wellness-slider" id="energySlider" min="1" max="5" value="' + (data.energy || 3) + '"><div class="slider-labels"><span>Low</span><span>Medium</span><span>High</span></div></div>';
     html += '<div class="slider-value" id="energyValue">' + getSliderEmoji(data.energy || 3) + '</div></div>';
 
-    // Fatigue
     html += '<div class="wellness-card"><div class="wellness-card-title">😴 Fatigue Level</div>';
     html += '<div class="slider-container"><input type="range" class="wellness-slider" id="fatigueSlider" min="1" max="5" value="' + (data.fatigue || 1) + '"><div class="slider-labels"><span>None</span><span>Moderate</span><span>Exhausted</span></div></div>';
     html += '<div class="slider-value" id="fatigueValue">' + getFatigueEmoji(data.fatigue || 1) + '</div></div>';
 
-    // Hunger
     html += '<div class="wellness-card"><div class="wellness-card-title">🍽️ Hunger Level</div>';
     html += '<div class="slider-container"><input type="range" class="wellness-slider" id="hungerSlider" min="1" max="5" value="' + (data.hunger || 3) + '"><div class="slider-labels"><span>Full</span><span>Normal</span><span>Starving</span></div></div>';
     html += '<div class="slider-value" id="hungerValue">' + getHungerEmoji(data.hunger || 3) + '</div></div>';
 
-    // Sleep
     html += '<div class="wellness-card"><div class="wellness-card-title">🌙 Sleep</div>';
     html += '<div class="slider-container"><input type="range" class="wellness-slider" id="sleepSlider" min="1" max="5" value="' + (data.sleepQuality || 3) + '"><div class="slider-labels"><span>Terrible</span><span>OK</span><span>Amazing</span></div></div>';
     html += '<div class="sleep-hours-group"><label class="auth-label">Hours slept</label><input type="number" class="auth-input sleep-input" id="sleepHours" placeholder="8" min="0" max="24" step="0.5" value="' + (data.sleepHours || '') + '"></div></div>';
 
-    // Pain
     html += '<div class="wellness-card"><div class="wellness-card-title">🤕 Pain / Discomfort</div><div class="pain-grid">';
     PAIN_AREAS.forEach(function(area) {
         let active = data.pain && data.pain.indexOf(area.id) > -1 ? ' active' : '';
@@ -414,7 +412,6 @@ function renderWellnessView(container) {
     }
     html += '</div>';
 
-    // Notes
     html += '<div class="wellness-card"><div class="wellness-card-title">📝 Notes</div>';
     html += '<textarea class="wellness-notes" id="wellnessNotes" placeholder="How do you feel? Any observations...">' + (data.notes || '') + '</textarea></div>';
 
@@ -422,7 +419,6 @@ function renderWellnessView(container) {
     html += '</div>';
     container.innerHTML = html;
 
-    // Event listeners
     container.querySelectorAll('.mood-btn').forEach(function(btn) {
         btn.addEventListener('click', function() {
             container.querySelectorAll('.mood-btn').forEach(function(b) { b.classList.remove('selected'); });
@@ -504,13 +500,13 @@ function renderStatsView(container) {
         html += '<div class="trend-change" style="color: ' + diffColor + '"><div class="trend-change-number">' + arrow + ' ' + diffSign + diff + ' kg</div><div class="trend-change-label">Since ' + formatDateShort(first.date) + '</div></div>';
         html += '</div>';
 
-        // Weight chart (simple bar visualization)
+        // Weight chart
         html += '<div class="weight-chart">';
         let maxWeight = Math.max.apply(null, weightHistory.map(function(w) { return w.weight; }));
         let minWeight = Math.min.apply(null, weightHistory.map(function(w) { return w.weight; }));
         let range = maxWeight - minWeight || 1;
 
-        let recentWeights = weightHistory.slice(-10); // Last 10 entries
+        let recentWeights = weightHistory.slice(-10);
         recentWeights.forEach(function(entry) {
             let height = Math.round(((entry.weight - minWeight) / range) * 60 + 30);
             let dateLabel = formatDateShort(entry.date);
@@ -522,7 +518,6 @@ function renderStatsView(container) {
         });
         html += '</div>';
 
-        // Weight history table
         html += '<div class="weight-history-list">';
         weightHistory.slice().reverse().slice(0, 8).forEach(function(entry) {
             let date = new Date(entry.date + 'T12:00:00');
@@ -539,7 +534,6 @@ function renderStatsView(container) {
 
     let wellnessDays = Object.keys(wellnessData).sort().reverse().slice(0, 7).reverse();
     if (wellnessDays.length > 0) {
-        // Mood trend
         html += '<div class="trend-card"><div class="trend-card-title">Mood History</div><div class="mood-history">';
         wellnessDays.forEach(function(day) {
             let w = wellnessData[day];
@@ -550,7 +544,6 @@ function renderStatsView(container) {
         });
         html += '</div></div>';
 
-        // Energy & Sleep averages
         let avgEnergy = 0, avgSleep = 0, avgFatigue = 0, count = 0;
         wellnessDays.forEach(function(day) {
             let w = wellnessData[day];
@@ -571,14 +564,11 @@ function renderStatsView(container) {
         html += '<div class="stats-card"><div class="stats-card-number">📅 ' + wellnessDays.length + '</div><div class="stats-card-label">Days Tracked</div></div>';
         html += '</div>';
 
-        // Pain frequency
         let painCount = {};
         Object.keys(wellnessData).forEach(function(day) {
             let w = wellnessData[day];
             if (w.pain && w.pain.length > 0) {
-                w.pain.forEach(function(p) {
-                    painCount[p] = (painCount[p] || 0) + 1;
-                });
+                w.pain.forEach(function(p) { painCount[p] = (painCount[p] || 0) + 1; });
             }
         });
 
@@ -614,13 +604,12 @@ function renderProfileView(container) {
     let html = '<div class="fade-in">';
     html += '<div class="section-title-main">👤 My Profile</div>';
 
-    // Account
     html += '<div class="profile-card"><div class="profile-card-title">📧 Account</div>';
     html += '<div class="profile-field"><span class="profile-label">Email</span><span class="profile-value">' + (currentUser ? currentUser.email : '') + '</span></div>';
     html += '<div class="profile-field"><span class="profile-label">Member since</span><span class="profile-value">' + (currentUser ? new Date(currentUser.metadata.creationTime).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) : '') + '</span></div>';
     html += '</div>';
 
-    // Weight Log (NEW)
+    // Weight Log
     html += '<div class="profile-card"><div class="profile-card-title">⚖️ Log Weight</div>';
     html += '<div class="weight-log-form">';
     html += '<div class="profile-input-group"><label class="auth-label">Weight (kg)</label><input type="number" class="auth-input" id="weightInput" placeholder="70.5" step="0.1"></div>';
@@ -628,7 +617,6 @@ function renderProfileView(container) {
     html += '<button class="btn btn-primary" id="btnLogWeight" style="margin-top: 12px; width: 100%;">Log Weight ⚖️</button>';
     html += '</div>';
 
-    // Recent weight entries
     if (weightHistory.length > 0) {
         html += '<div class="weight-recent-title">Recent Entries</div>';
         html += '<div class="weight-history-list">';
@@ -682,7 +670,6 @@ function renderProfileView(container) {
     html += '</div>';
     container.innerHTML = html;
 
-    // Event listeners
     container.querySelectorAll('.goal-btn').forEach(function(btn) {
         btn.addEventListener('click', function() {
             container.querySelectorAll('.goal-btn').forEach(function(b) { b.classList.remove('selected'); });
@@ -720,6 +707,37 @@ function renderProfileView(container) {
     });
 
     document.getElementById('btnLogoutProfile').addEventListener('click', function() { auth.signOut(); });
+}
+
+// === Video Modal ===
+function openVideoModal(url) {
+    let videoId = '';
+    if (url.indexOf('shorts/') > -1) {
+        videoId = url.split('shorts/')[1].split('?')[0];
+    } else if (url.indexOf('v=') > -1) {
+        videoId = url.split('v=')[1].split('&')[0];
+    }
+
+    let modal = document.createElement('div');
+    modal.className = 'video-modal';
+    modal.innerHTML = '<div class="video-modal-overlay"></div>' +
+        '<div class="video-modal-content">' +
+        '<button class="video-modal-close">✕</button>' +
+        '<div class="video-modal-player">' +
+        '<iframe src="https://www.youtube.com/embed/' + videoId + '?autoplay=1&rel=0&modestbranding=1" ' +
+        'frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>' +
+        '</div></div>';
+
+    document.body.appendChild(modal);
+    setTimeout(function() { modal.classList.add('active'); }, 10);
+
+    modal.querySelector('.video-modal-overlay').addEventListener('click', function() { closeVideoModal(modal); });
+    modal.querySelector('.video-modal-close').addEventListener('click', function() { closeVideoModal(modal); });
+}
+
+function closeVideoModal(modal) {
+    modal.classList.remove('active');
+    setTimeout(function() { modal.remove(); }, 300);
 }
 
 // === Helper Functions ===
