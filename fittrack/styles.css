@@ -1335,3 +1335,249 @@ select.auth-input {
     border-radius: var(--radius-full);
 }
 
+
+/* === Weight Trend === */
+.trend-summary {
+    display: flex;
+    justify-content: space-around;
+    padding: 16px;
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-subtle);
+    margin-bottom: 16px;
+}
+
+.trend-current {
+    text-align: center;
+}
+
+.trend-current-number {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--text-primary);
+}
+
+.trend-current-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
+.trend-change {
+    text-align: center;
+}
+
+.trend-change-number {
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.trend-change-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
+/* Weight Chart */
+.weight-chart {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-around;
+    padding: 20px 10px;
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-subtle);
+    margin-bottom: 16px;
+    min-height: 140px;
+    gap: 4px;
+}
+
+.weight-bar-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+}
+
+.weight-bar-value {
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--text-secondary);
+}
+
+.weight-bar {
+    width: 100%;
+    max-width: 28px;
+    background: linear-gradient(180deg, var(--green-primary), var(--green-dark));
+    border-radius: 4px 4px 0 0;
+    min-height: 20px;
+    transition: height 0.3s ease;
+}
+
+.weight-bar-date {
+    font-size: 8px;
+    color: var(--text-dim);
+    text-align: center;
+}
+
+/* Weight History */
+.weight-history-list {
+    margin-top: 12px;
+}
+
+.weight-history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    background: var(--bg-surface);
+    border-radius: var(--radius-sm);
+    margin-bottom: 6px;
+}
+
+.weight-history-date {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.weight-history-value {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.weight-recent-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-top: 16px;
+    margin-bottom: 8px;
+}
+
+.weight-log-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Trend Cards */
+.trend-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    margin-bottom: 16px;
+    border: 1px solid var(--border-subtle);
+}
+
+.trend-card-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+}
+
+/* Mood History */
+.mood-history {
+    display: flex;
+    justify-content: space-around;
+    gap: 8px;
+}
+
+.mood-history-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.mood-history-emoji {
+    font-size: 24px;
+}
+
+.mood-history-date {
+    font-size: 9px;
+    color: var(--text-dim);
+}
+
+/* Pain Frequency */
+.pain-freq-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.pain-freq-item:last-child {
+    border-bottom: none;
+}
+
+.pain-freq-label {
+    font-size: 13px;
+    color: var(--text-primary);
+}
+
+.pain-freq-count {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--red);
+    background: var(--red-bg);
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+}
+
+/* === Scrollbar === */
+::-webkit-scrollbar {
+    width: 4px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-deep);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-subtle);
+    border-radius: 10px;
+}
+
+/* === Select Dropdown === */
+select.auth-input {
+    -webkit-appearance: none;
+    appearance: none;
+    padding-right: 36px;
+}
+
+/* === Date Input === */
+input[type="date"].auth-input {
+    -webkit-appearance: none;
+    appearance: none;
+    color: var(--text-primary);
+}
+
+input[type="date"].auth-input::-webkit-calendar-picker-indicator {
+    filter: invert(0.7);
+    cursor: pointer;
+}
+
+/* === Responsive === */
+@media (max-width: 360px) {
+    .mood-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .goal-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+
+    .profile-form-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
