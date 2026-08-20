@@ -1,0 +1,64 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="FitTrack">
+    <meta name="theme-color" content="#0f1a14">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <title>FitTrack - Daily Workout</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Splash Screen -->
+    <div id="splashScreen" class="splash-screen">
+        <div class="splash-content">
+            <div class="splash-icon">💪</div>
+            <h1 class="splash-title">FitTrack</h1>
+            <p class="splash-subtitle">Daily Workout Tracker</p>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="app" class="app hidden">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1 class="header-title">💪 FitTrack</h1>
+                <p class="header-subtitle" id="todayDate"></p>
+            </div>
+        </header>
+
+        <!-- Content -->
+        <main id="content" class="content">
+        </main>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <button class="nav-btn active" data-view="today">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label">Today</span>
+            </button>
+            <button class="nav-btn" data-view="exercises">
+                <span class="nav-icon">📅</span>
+                <span class="nav-label">Calendar</span>
+            </button>
+            <button class="nav-btn" data-view="history">
+                <span class="nav-icon">📋</span>
+                <span class="nav-label">History</span>
+            </button>
+            <button class="nav-btn" data-view="stats">
+                <span class="nav-icon">📊</span>
+                <span class="nav-label">Stats</span>
+            </button>
+        </nav>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
+
