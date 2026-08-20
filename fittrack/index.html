@@ -68,28 +68,32 @@
         <main id="content" class="content">
         </main>
 
-        <!-- Bottom Navigation -->
+        <!-- Bottom Navigation - 5 tabs -->
         <nav class="bottom-nav">
             <button class="nav-btn active" data-view="today">
                 <span class="nav-icon">🏠</span>
                 <span class="nav-label">Today</span>
             </button>
-            <button class="nav-btn" data-view="exercises">
+            <button class="nav-btn" data-view="calendar">
                 <span class="nav-icon">📅</span>
                 <span class="nav-label">Calendar</span>
             </button>
-            <button class="nav-btn" data-view="history">
-                <span class="nav-icon">📋</span>
-                <span class="nav-label">History</span>
+            <button class="nav-btn" data-view="wellness">
+                <span class="nav-icon">🧠</span>
+                <span class="nav-label">Wellness</span>
             </button>
             <button class="nav-btn" data-view="stats">
                 <span class="nav-icon">📊</span>
                 <span class="nav-label">Stats</span>
             </button>
+            <button class="nav-btn" data-view="profile">
+                <span class="nav-icon">👤</span>
+                <span class="nav-label">Profile</span>
+            </button>
         </nav>
     </div>
 
-    <!-- Firebase SDK (CDN - no npm needed) -->
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
