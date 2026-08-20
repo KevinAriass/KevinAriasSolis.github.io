@@ -3,7 +3,7 @@
     "name": "StudyPath - Learning Plan",
     "short_name": "StudyPath",
     "description": "Interactive study plan to track your learning journey",
-   "start_url": "/studypath/index.html",
+    "start_url": "/KevinAriasSolis.github.io/studypath/index.html"
     "display": "standalone",
     "background_color": "#0f1a14",
     "theme_color": "#0f1a14",
