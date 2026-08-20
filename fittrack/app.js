@@ -1,7 +1,7 @@
 
 // ============================================
-// FITTRACK PWA - DAILY WORKOUT TRACKER v5
-// Firebase + Wellness + Profile + Weight + Trends + GIFs
+// FITTRACK PWA - DAILY WORKOUT TRACKER v6
+// Firebase + Wellness + Profile + Weight + Instructions + Monthly Rotation
 // ============================================
 
 // === Firebase Configuration ===
@@ -41,20 +41,60 @@ const REWARDS = [
     { calories: 1000, emoji: '🍝', name: 'Pasta Alfredo', description: '~1000 cal' }
 ];
 
-const EXERCISES = [
-    { id: 'pushups', name: 'Push-ups', reps: '3 sets x 10 reps', category: 'Upper Body', calPerSet: 20, gif: 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Push-Up.gif' },
-    { id: 'squats', name: 'Squats', reps: '3 sets x 15 reps', category: 'Lower Body', calPerSet: 30, gif: 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Barbell-Squat.gif' },
-    { id: 'plank', name: 'Plank', reps: '3 sets x 30 seconds', category: 'Core', calPerSet: 15, gif: 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Front-Plank.gif' },
-    { id: 'lunges', name: 'Lunges', reps: '3 sets x 10 each leg', category: 'Lower Body', calPerSet: 28, gif: 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Bodyweight-Walking-Lunge.gif' },
-    { id: 'burpees', name: 'Burpees', reps: '3 sets x 8 reps', category: 'Full Body', calPerSet: 40, gif: 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Burpee.gif' },
-    { id: 'mountain_climbers', name: 'Mountain Climbers', reps: '3 sets x 20 reps', category: 'Cardio', calPerSet: 30, gif: 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Mountain-Climber.gif' },
-    { id: 'crunches', name: 'Crunches', reps: '3 sets x 15 reps', category: 'Core', calPerSet: 15, gif: 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Crunch.gif' },
-    { id: 'jumping_jacks', name: 'Jumping Jacks', reps: '3 sets x 20 reps', category: 'Cardio', calPerSet: 25, gif: 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Jumping-Jack.gif' },
-    { id: 'tricep_dips', name: 'Tricep Dips (chair)', reps: '3 sets x 10 reps', category: 'Upper Body', calPerSet: 20, gif: 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Bench-Dip.gif' },
-    { id: 'glute_bridge', name: 'Glute Bridge', reps: '3 sets x 15 reps', category: 'Lower Body', calPerSet: 22, gif: 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Glute-Bridge.gif' },
-    { id: 'superman', name: 'Superman Hold', reps: '3 sets x 10 reps', category: 'Core', calPerSet: 18, gif: 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Superman.gif' },
-    { id: 'high_knees', name: 'High Knees', reps: '3 sets x 30 seconds', category: 'Cardio', calPerSet: 35, gif: 'https://fitnessprogramer.com/wp-content/uploads/2021/02/Run-in-Place.gif' }
+// === FULL EXERCISE DATABASE (36 exercises - 12 per rotation) ===
+const ALL_EXERCISES = [
+    // === SET A (Months: Jan, Apr, Jul, Oct) ===
+    { id: 'pushups', name: 'Push-ups', reps: '3 sets x 10 reps', category: 'Upper Body', calPerSet: 20, emoji: '🫸', muscles: 'Chest, Triceps, Shoulders', steps: ['Place hands shoulder-width apart on the floor', 'Keep your body straight like a plank', 'Lower your chest until almost touching the floor', 'Push back up to starting position'], tip: 'Don\'t let your hips sag or pike up!' },
+    { id: 'squats', name: 'Squats', reps: '3 sets x 15 reps', category: 'Lower Body', calPerSet: 30, emoji: '🦵', muscles: 'Quads, Glutes, Hamstrings', steps: ['Stand with feet shoulder-width apart', 'Push hips back like sitting in a chair', 'Lower until thighs are parallel to floor', 'Drive through heels to stand back up'], tip: 'Keep your knees behind your toes!' },
+    { id: 'plank', name: 'Plank', reps: '3 sets x 30 seconds', category: 'Core', calPerSet: 15, emoji: '🧘', muscles: 'Core, Shoulders, Back', steps: ['Place forearms on the floor, elbows under shoulders', 'Extend legs back, toes on the floor', 'Keep body in a straight line from head to heels', 'Hold the position, breathe steadily'], tip: 'Squeeze your glutes and abs tight!' },
+    { id: 'lunges', name: 'Lunges', reps: '3 sets x 10 each leg', category: 'Lower Body', calPerSet: 28, emoji: '🚶', muscles: 'Quads, Glutes, Hamstrings', steps: ['Stand tall with feet hip-width apart', 'Step forward with one leg', 'Lower back knee toward the floor (90° angle)', 'Push off front foot to return to start'], tip: 'Keep your torso upright throughout!' },
+    { id: 'burpees', name: 'Burpees', reps: '3 sets x 8 reps', category: 'Full Body', calPerSet: 40, emoji: '💥', muscles: 'Full Body, Cardio', steps: ['Stand tall, then squat down placing hands on floor', 'Jump feet back into plank position', 'Do one push-up (optional)', 'Jump feet forward and explode up with arms overhead'], tip: 'Land softly on your feet!' },
+    { id: 'mountain_climbers', name: 'Mountain Climbers', reps: '3 sets x 20 reps', category: 'Cardio', calPerSet: 30, emoji: '⛰️', muscles: 'Core, Shoulders, Hip Flexors', steps: ['Start in push-up position', 'Drive one knee toward your chest', 'Quickly switch legs in a running motion', 'Keep hips low and core tight'], tip: 'Go fast but maintain good form!' },
+    { id: 'crunches', name: 'Crunches', reps: '3 sets x 15 reps', category: 'Core', calPerSet: 15, emoji: '🔥', muscles: 'Abs (Rectus Abdominis)', steps: ['Lie on your back, knees bent, feet flat', 'Place hands behind your head (don\'t pull neck)', 'Curl shoulders off the floor using your abs', 'Lower back down with control'], tip: 'Focus on squeezing your abs, not pulling your neck!' },
+    { id: 'jumping_jacks', name: 'Jumping Jacks', reps: '3 sets x 20 reps', category: 'Cardio', calPerSet: 25, emoji: '⭐', muscles: 'Full Body, Cardio', steps: ['Stand with feet together, arms at sides', 'Jump feet out wide while raising arms overhead', 'Jump feet back together, arms down', 'Repeat at a steady pace'], tip: 'Land softly on the balls of your feet!' },
+    { id: 'tricep_dips', name: 'Tricep Dips (chair)', reps: '3 sets x 10 reps', category: 'Upper Body', calPerSet: 20, emoji: '💺', muscles: 'Triceps, Shoulders, Chest', steps: ['Sit on edge of a sturdy chair, hands gripping edge', 'Slide hips off the chair, legs extended', 'Lower body by bending elbows to 90°', 'Push back up to starting position'], tip: 'Keep your back close to the chair!' },
+    { id: 'glute_bridge', name: 'Glute Bridge', reps: '3 sets x 15 reps', category: 'Lower Body', calPerSet: 22, emoji: '🍑', muscles: 'Glutes, Hamstrings, Core', steps: ['Lie on back, knees bent, feet flat on floor', 'Push through heels to lift hips toward ceiling', 'Squeeze glutes at the top', 'Lower hips back down with control'], tip: 'Don\'t arch your lower back at the top!' },
+    { id: 'superman', name: 'Superman Hold', reps: '3 sets x 10 reps', category: 'Core', calPerSet: 18, emoji: '🦸', muscles: 'Lower Back, Glutes, Shoulders', steps: ['Lie face down, arms extended overhead', 'Simultaneously lift arms, chest, and legs off floor', 'Hold for 2-3 seconds at the top', 'Lower back down with control'], tip: 'Look at the floor to keep neck neutral!' },
+    { id: 'high_knees', name: 'High Knees', reps: '3 sets x 30 seconds', category: 'Cardio', calPerSet: 35, emoji: '🏃', muscles: 'Hip Flexors, Core, Cardio', steps: ['Stand tall with feet hip-width apart', 'Drive one knee up to hip height', 'Quickly switch to the other knee', 'Pump arms like sprinting'], tip: 'Stay on the balls of your feet!' },
+
+    // === SET B (Months: Feb, May, Aug, Nov) ===
+    { id: 'diamond_pushups', name: 'Diamond Push-ups', reps: '3 sets x 8 reps', category: 'Upper Body', calPerSet: 25, emoji: '💎', muscles: 'Triceps, Chest, Shoulders', steps: ['Place hands together forming a diamond shape', 'Keep body straight in plank position', 'Lower chest toward your hands', 'Push back up squeezing triceps'], tip: 'Keep elbows close to your body!' },
+    { id: 'sumo_squats', name: 'Sumo Squats', reps: '3 sets x 15 reps', category: 'Lower Body', calPerSet: 28, emoji: '🦍', muscles: 'Inner Thighs, Glutes, Quads', steps: ['Stand with feet wider than shoulder-width, toes out', 'Lower hips straight down', 'Keep chest up and knees tracking over toes', 'Push through heels to stand'], tip: 'Go as deep as your flexibility allows!' },
+    { id: 'bicycle_crunches', name: 'Bicycle Crunches', reps: '3 sets x 20 reps', category: 'Core', calPerSet: 20, emoji: '🚴', muscles: 'Obliques, Abs, Hip Flexors', steps: ['Lie on back, hands behind head, legs raised', 'Bring right elbow toward left knee', 'Extend right leg while twisting', 'Alternate sides in a pedaling motion'], tip: 'Slow and controlled beats fast and sloppy!' },
+    { id: 'wall_sit', name: 'Wall Sit', reps: '3 sets x 30 seconds', category: 'Lower Body', calPerSet: 20, emoji: '🧱', muscles: 'Quads, Glutes, Calves', steps: ['Lean back against a wall', 'Slide down until thighs are parallel to floor', 'Keep knees at 90° angle', 'Hold the position, breathe steadily'], tip: 'Press your lower back flat against the wall!' },
+    { id: 'pike_pushups', name: 'Pike Push-ups', reps: '3 sets x 8 reps', category: 'Upper Body', calPerSet: 22, emoji: '🔺', muscles: 'Shoulders, Triceps, Upper Chest', steps: ['Start in downward dog position (hips high)', 'Bend elbows and lower head toward floor', 'Push back up to starting position', 'Keep legs as straight as possible'], tip: 'The more vertical you are, the harder it gets!' },
+    { id: 'lateral_lunges', name: 'Lateral Lunges', reps: '3 sets x 10 each side', category: 'Lower Body', calPerSet: 26, emoji: '↔️', muscles: 'Inner Thighs, Glutes, Quads', steps: ['Stand tall with feet together', 'Step wide to one side, bending that knee', 'Push hips back, keep other leg straight', 'Push off to return to center'], tip: 'Keep your chest up and core tight!' },
+    { id: 'flutter_kicks', name: 'Flutter Kicks', reps: '3 sets x 20 reps', category: 'Core', calPerSet: 18, emoji: '🦶', muscles: 'Lower Abs, Hip Flexors', steps: ['Lie on back, hands under hips for support', 'Lift both legs slightly off the floor', 'Alternate kicking legs up and down', 'Keep lower back pressed to floor'], tip: 'Smaller kicks = more ab engagement!' },
+    { id: 'squat_jumps', name: 'Squat Jumps', reps: '3 sets x 10 reps', category: 'Cardio', calPerSet: 35, emoji: '🦘', muscles: 'Quads, Glutes, Calves, Cardio', steps: ['Stand with feet shoulder-width apart', 'Lower into a squat position', 'Explode upward jumping as high as possible', 'Land softly and immediately go into next squat'], tip: 'Land with soft knees to protect joints!' },
+    { id: 'shoulder_taps', name: 'Shoulder Taps', reps: '3 sets x 16 reps', category: 'Core', calPerSet: 18, emoji: '👋', muscles: 'Core, Shoulders, Chest', steps: ['Start in push-up position, hands under shoulders', 'Lift one hand and tap opposite shoulder', 'Return hand to floor', 'Alternate sides, keeping hips still'], tip: 'The wider your feet, the easier the balance!' },
+    { id: 'calf_raises', name: 'Calf Raises', reps: '3 sets x 20 reps', category: 'Lower Body', calPerSet: 15, emoji: '🦶', muscles: 'Calves (Gastrocnemius, Soleus)', steps: ['Stand on edge of a step or flat floor', 'Rise up onto your toes as high as possible', 'Hold at the top for 1 second', 'Lower back down slowly'], tip: 'Go slow on the way down for more burn!' },
+    { id: 'inchworms', name: 'Inchworms', reps: '3 sets x 8 reps', category: 'Full Body', calPerSet: 25, emoji: '🐛', muscles: 'Core, Shoulders, Hamstrings', steps: ['Stand tall, bend forward touching the floor', 'Walk hands out to push-up position', 'Do one push-up (optional)', 'Walk hands back to feet and stand up'], tip: 'Keep legs as straight as possible!' },
+    { id: 'skaters', name: 'Skaters', reps: '3 sets x 20 reps', category: 'Cardio', calPerSet: 30, emoji: '⛸️', muscles: 'Glutes, Quads, Balance, Cardio', steps: ['Stand on one leg', 'Jump laterally to the other leg', 'Land softly on one foot, other leg behind', 'Immediately jump back to the other side'], tip: 'Swing your arms for momentum!' },
+
+    // === SET C (Months: Mar, Jun, Sep, Dec) ===
+    { id: 'wide_pushups', name: 'Wide Push-ups', reps: '3 sets x 10 reps', category: 'Upper Body', calPerSet: 22, emoji: '🤸', muscles: 'Chest, Shoulders, Triceps', steps: ['Place hands wider than shoulder-width', 'Keep body straight in plank position', 'Lower chest toward the floor', 'Push back up focusing on chest squeeze'], tip: 'The wider the hands, the more chest activation!' },
+    { id: 'bulgarian_split', name: 'Bulgarian Split Squat', reps: '3 sets x 8 each leg', category: 'Lower Body', calPerSet: 32, emoji: '🇧🇬', muscles: 'Quads, Glutes, Balance', steps: ['Stand in front of a chair or bench', 'Place one foot behind you on the chair', 'Lower front knee to 90° angle', 'Push through front heel to stand'], tip: 'Keep most of your weight on the front leg!' },
+    { id: 'dead_bug', name: 'Dead Bug', reps: '3 sets x 12 reps', category: 'Core', calPerSet: 16, emoji: '🪲', muscles: 'Deep Core, Hip Flexors', steps: ['Lie on back, arms pointing to ceiling', 'Raise legs with knees at 90°', 'Extend opposite arm and leg simultaneously', 'Return to start and alternate sides'], tip: 'Press lower back into the floor the entire time!' },
+    { id: 'reverse_lunges', name: 'Reverse Lunges', reps: '3 sets x 10 each leg', category: 'Lower Body', calPerSet: 28, emoji: '🔙', muscles: 'Glutes, Quads, Hamstrings', steps: ['Stand tall with feet hip-width apart', 'Step one foot backward', 'Lower back knee toward the floor', 'Push off back foot to return to start'], tip: 'Easier on knees than forward lunges!' },
+    { id: 'commando_plank', name: 'Commando Plank', reps: '3 sets x 10 reps', category: 'Core', calPerSet: 22, emoji: '🎖️', muscles: 'Core, Shoulders, Triceps', steps: ['Start in forearm plank position', 'Push up to one hand, then the other (high plank)', 'Lower back to one forearm, then the other', 'Alternate which arm leads each rep'], tip: 'Keep hips as still as possible!' },
+    { id: 'donkey_kicks', name: 'Donkey Kicks', reps: '3 sets x 15 each leg', category: 'Lower Body', calPerSet: 20, emoji: '🫏', muscles: 'Glutes, Hamstrings, Core', steps: ['Start on all fours (hands and knees)', 'Keep knee bent at 90°', 'Lift one leg up toward the ceiling', 'Squeeze glute at the top, lower with control'], tip: 'Don\'t arch your back - keep core tight!' },
+    { id: 'russian_twists', name: 'Russian Twists', reps: '3 sets x 20 reps', category: 'Core', calPerSet: 20, emoji: '🌀', muscles: 'Obliques, Abs, Hip Flexors', steps: ['Sit with knees bent, lean back slightly', 'Lift feet off floor (or keep them down for easier)', 'Rotate torso side to side', 'Touch the floor on each side'], tip: 'The more you lean back, the harder it gets!' },
+    { id: 'box_step_ups', name: 'Step-ups (chair)', reps: '3 sets x 10 each leg', category: 'Lower Body', calPerSet: 28, emoji: '📦', muscles: 'Quads, Glutes, Calves', steps: ['Stand in front of a sturdy chair or step', 'Step up with one foot, driving through heel', 'Stand fully on top', 'Step back down with control'], tip: 'Use a lower surface if balance is difficult!' },
+    { id: 'bear_crawl', name: 'Bear Crawl', reps: '3 sets x 30 seconds', category: 'Full Body', calPerSet: 30, emoji: '🐻', muscles: 'Core, Shoulders, Quads', steps: ['Start on all fours, lift knees 1 inch off floor', 'Move opposite hand and foot forward', 'Then move the other hand and foot', 'Keep hips low and back flat'], tip: 'Keep knees hovering just above the ground!' },
+    { id: 'side_plank', name: 'Side Plank', reps: '3 sets x 20 sec each side', category: 'Core', calPerSet: 16, emoji: '📐', muscles: 'Obliques, Core, Shoulders', steps: ['Lie on your side, forearm on the floor', 'Stack feet or stagger them for balance', 'Lift hips creating a straight line', 'Hold position, breathe steadily'], tip: 'Don\'t let your hips drop!' },
+    { id: 'tuck_jumps', name: 'Tuck Jumps', reps: '3 sets x 8 reps', category: 'Cardio', calPerSet: 38, emoji: '🚀', muscles: 'Quads, Core, Cardio', steps: ['Stand with feet shoulder-width apart', 'Jump up explosively', 'Tuck knees toward chest at peak', 'Land softly with bent knees'], tip: 'Start with small tucks and progress!' },
+    { id: 'fire_hydrants', name: 'Fire Hydrants', reps: '3 sets x 15 each leg', category: 'Lower Body', calPerSet: 18, emoji: '🚒', muscles: 'Glutes (Medius), Hip Abductors', steps: ['Start on all fours (hands and knees)', 'Keep knee bent at 90°', 'Lift one leg out to the side (like a dog)', 'Lower with control, repeat'], tip: 'Keep your core tight and hips level!' }
 ];
+
+// Function to get exercises for current month
+function getMonthlyExercises() {
+    let month = new Date().getMonth(); // 0-11
+    let setIndex;
+    if (month === 0 || month === 3 || month === 6 || month === 9) setIndex = 0; // Jan, Apr, Jul, Oct = Set A
+    else if (month === 1 || month === 4 || month === 7 || month === 10) setIndex = 1; // Feb, May, Aug, Nov = Set B
+    else setIndex = 2; // Mar, Jun, Sep, Dec = Set C
+    return ALL_EXERCISES.slice(setIndex * 12, (setIndex + 1) * 12);
+}
 
 const MOOD_OPTIONS = [
     { id: 'happy', emoji: '😊', label: 'Happy' },
@@ -258,6 +298,12 @@ function renderTodayView(container) {
         html += '<div class="streak-banner"><span class="streak-banner-fire">⭐</span><span class="streak-banner-text">' + streak + ' day streak</span><span class="streak-banner-msg">' + getStreakMessage(streak) + '</span></div>';
     }
 
+    // Monthly set indicator
+    let monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    let currentMonth = new Date().getMonth();
+    let setLetter = (currentMonth === 0 || currentMonth === 3 || currentMonth === 6 || currentMonth === 9) ? 'A' : (currentMonth === 1 || currentMonth === 4 || currentMonth === 7 || currentMonth === 10) ? 'B' : 'C';
+    html += '<div class="month-set-badge">📅 ' + monthNames[currentMonth] + ' • Set ' + setLetter + '</div>';
+
     html += '<div class="jump-card"><div class="jump-card-header"><span class="jump-card-title">🪢 Jump Rope</span>' + statusBadge + '</div>';
     html += '<div class="jump-counter"><div class="jump-count-display">' + jumpCount + '</div><div class="jump-count-goal">/ ' + JUMP_GOAL + ' jumps</div>';
     html += '<div class="jump-progress-bar"><div class="jump-progress-fill" style="width: ' + jumpPercent + '%"></div></div></div>';
@@ -279,9 +325,9 @@ function renderTodayView(container) {
         let isCompleted = dayData.exercises && dayData.exercises[exercise.id];
         html += '<div class="exercise-card ' + (isCompleted ? 'completed' : '') + '" data-exercise-id="' + exercise.id + '">';
         html += '<div class="exercise-checkbox"><span class="exercise-check-icon">✓</span></div>';
-        html += '<div class="exercise-info"><div class="exercise-name">' + exercise.name + '</div><div class="exercise-detail">' + exercise.reps + ' • ' + exercise.calPerSet + ' cal</div></div>';
+        html += '<div class="exercise-info"><div class="exercise-name">' + exercise.emoji + ' ' + exercise.name + '</div><div class="exercise-detail">' + exercise.reps + ' • ' + exercise.calPerSet + ' cal</div></div>';
         if (isCompleted) html += '<div class="exercise-time">' + dayData.exercises[exercise.id] + '</div>';
-        html += '<button class="exercise-video-btn" data-gif="' + exercise.gif + '">▶</button>';
+        html += '<button class="exercise-video-btn" data-exercise-id="' + exercise.id + '">?</button>';
         html += '</div>';
     });
 
@@ -307,12 +353,13 @@ function renderTodayView(container) {
         });
     });
 
-    // GIF button listeners
+    // Info button listeners
     container.querySelectorAll('.exercise-video-btn').forEach(function(btn) {
         btn.addEventListener('click', function(e) {
             e.stopPropagation();
-            let gifUrl = btn.getAttribute('data-gif');
-            openGifModal(gifUrl);
+            let exerciseId = btn.getAttribute('data-exercise-id');
+            let exercise = ALL_EXERCISES.find(function(ex) { return ex.id === exerciseId; });
+            if (exercise) openExerciseModal(exercise);
         });
     });
 }
@@ -464,7 +511,7 @@ function renderWellnessView(container) {
     });
 }
 
-// === STATS VIEW (with Trends) ===
+// === STATS VIEW ===
 function renderStatsView(container) {
     let days = Object.keys(appData);
     let completedDays = days.filter(function(d) { return appData[d].jumpCompleted; }).length;
@@ -513,14 +560,6 @@ function renderStatsView(container) {
             html += '<div class="weight-bar" style="height: ' + height + 'px; min-height: ' + height + 'px; max-height: ' + height + 'px;"></div>';
             html += '<div class="weight-bar-date">' + dateLabel + '</div>';
             html += '</div>';
-        });
-        html += '</div>';
-
-        html += '<div class="weight-history-list">';
-        weightHistory.slice().reverse().slice(0, 8).forEach(function(entry) {
-            let date = new Date(entry.date + 'T12:00:00');
-            let dateStr = date.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'short' });
-            html += '<div class="weight-history-item"><span class="weight-history-date">' + dateStr + '</span><span class="weight-history-value">' + entry.weight + ' kg</span></div>';
         });
         html += '</div>';
     } else {
@@ -607,7 +646,6 @@ function renderProfileView(container) {
     html += '<div class="profile-field"><span class="profile-label">Member since</span><span class="profile-value">' + (currentUser ? new Date(currentUser.metadata.creationTime).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) : '') + '</span></div>';
     html += '</div>';
 
-    // Weight Log
     html += '<div class="profile-card"><div class="profile-card-title">⚖️ Log Weight</div>';
     html += '<div class="weight-log-form">';
     html += '<div class="profile-input-group"><label class="auth-label">Weight (kg)</label><input type="number" class="auth-input" id="weightInput" placeholder="70.5" step="0.1"></div>';
@@ -627,7 +665,6 @@ function renderProfileView(container) {
     }
     html += '</div>';
 
-    // Body info
     html += '<div class="profile-card"><div class="profile-card-title">📏 Body Info</div>';
     html += '<div class="profile-form-grid">';
     html += '<div class="profile-input-group"><label class="auth-label">Height (cm)</label><input type="number" class="auth-input" id="profileHeight" placeholder="170" value="' + (profileData.height || '') + '"></div>';
@@ -635,8 +672,8 @@ function renderProfileView(container) {
     html += '<div class="profile-input-group"><label class="auth-label">Gender</label><select class="auth-input" id="profileGender"><option value="">Select</option><option value="male"' + (profileData.gender === 'male' ? ' selected' : '') + '>Male</option><option value="female"' + (profileData.gender === 'female' ? ' selected' : '') + '>Female</option><option value="other"' + (profileData.gender === 'other' ? ' selected' : '') + '>Other</option></select></div>';
     html += '</div></div>';
 
-    // Fitness goal
     html += '<div class="profile-card"><div class="profile-card-title">🎯 Fitness Goal</div><div class="goal-grid">';
+   
     let goals = [
         { id: 'lose_weight', emoji: '⬇️', label: 'Lose Weight' },
         { id: 'gain_muscle', emoji: '💪', label: 'Gain Muscle' },
@@ -707,25 +744,40 @@ function renderProfileView(container) {
     document.getElementById('btnLogoutProfile').addEventListener('click', function() { auth.signOut(); });
 }
 
-// === GIF Modal ===
-function openGifModal(gifUrl) {
+// === Exercise Info Modal ===
+function openExerciseModal(exercise) {
     let modal = document.createElement('div');
     modal.className = 'video-modal';
+
+    let stepsHtml = '';
+    exercise.steps.forEach(function(step, index) {
+        stepsHtml += '<div class="exercise-step"><span class="step-number">' + (index + 1) + '</span><span class="step-text">' + step + '</span></div>';
+    });
+
     modal.innerHTML = '<div class="video-modal-overlay"></div>' +
-        '<div class="video-modal-content">' +
+        '<div class="video-modal-content exercise-modal-content">' +
         '<button class="video-modal-close">✕</button>' +
-        '<div class="gif-modal-player">' +
-        '<img src="' + gifUrl + '" alt="Exercise demo" class="gif-modal-img">' +
+        '<div class="exercise-modal-body">' +
+        '<div class="exercise-modal-emoji">' + exercise.emoji + '</div>' +
+        '<div class="exercise-modal-name">' + exercise.name + '</div>' +
+        '<div class="exercise-modal-category">' + exercise.category + '</div>' +
+        '<div class="exercise-modal-section-title">📋 How to do it:</div>' +
+        '<div class="exercise-steps">' + stepsHtml + '</div>' +
+        '<div class="exercise-modal-section-title">💪 Muscles worked:</div>' +
+        '<div class="exercise-modal-muscles">' + exercise.muscles + '</div>' +
+        '<div class="exercise-modal-section-title">⚠️ Tip:</div>' +
+        '<div class="exercise-modal-tip">' + exercise.tip + '</div>' +
+        '<div class="exercise-modal-reps">' + exercise.reps + ' • ' + exercise.calPerSet + ' cal per set</div>' +
         '</div></div>';
 
     document.body.appendChild(modal);
     setTimeout(function() { modal.classList.add('active'); }, 10);
 
-    modal.querySelector('.video-modal-overlay').addEventListener('click', function() { closeGifModal(modal); });
-    modal.querySelector('.video-modal-close').addEventListener('click', function() { closeGifModal(modal); });
+    modal.querySelector('.video-modal-overlay').addEventListener('click', function() { closeExerciseModal(modal); });
+    modal.querySelector('.video-modal-close').addEventListener('click', function() { closeExerciseModal(modal); });
 }
 
-function closeGifModal(modal) {
+function closeExerciseModal(modal) {
     modal.classList.remove('active');
     setTimeout(function() { modal.remove(); }, 300);
 }
@@ -795,11 +847,12 @@ function toggleExercise(exerciseId) {
 }
 
 function getTodayExercises() {
+    let monthlyExercises = getMonthlyExercises();
     let today = new Date();
     let dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / 86400000);
-    let startIndex = (dayOfYear * 6) % EXERCISES.length;
+    let startIndex = (dayOfYear * 6) % monthlyExercises.length;
     let exercises = [];
-    for (let i = 0; i < 6; i++) exercises.push(EXERCISES[(startIndex + i) % EXERCISES.length]);
+    for (let i = 0; i < 6; i++) exercises.push(monthlyExercises[(startIndex + i) % monthlyExercises.length]);
     return exercises;
 }
 
@@ -808,7 +861,7 @@ function calculateDayCalories(dayData) {
     if (dayData.jumpCount) cal += Math.round(dayData.jumpCount * CALORIES_PER_JUMP);
     if (dayData.exercises) {
         Object.keys(dayData.exercises).forEach(function(exId) {
-            let ex = EXERCISES.find(function(e) { return e.id === exId; });
+            let ex = ALL_EXERCISES.find(function(e) { return e.id === exId; });
             if (ex) cal += ex.calPerSet;
         });
     }
