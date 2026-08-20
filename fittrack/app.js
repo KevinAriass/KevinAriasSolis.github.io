@@ -126,11 +126,21 @@ function loginUser() {
 }
 
 function registerUser() {
-    var email = document.getElementById('authEmail').value;
+    var email = document.getElementById('authEmail').value.trim();
     var password = document.getElementById('authPassword').value;
     hideAuthError();
 
-    if (password.length < 6) {
+    if (!email) {
+        showAuthError('Please enter your email');
+        return;
+    }
+
+    if (!email.includes('@') || !email.includes('.')) {
+        showAuthError('Please enter a valid email');
+        return;
+    }
+
+    if (!password || password.length < 6) {
         showAuthError('Password must be at least 6 characters');
         return;
     }
