@@ -1,8 +1,29 @@
 
 // ============================================
-// FITTRACK PWA - DAILY WORKOUT TRACKER v2
-// Con calendario, racha y recompensas
+// FITTRACK PWA - DAILY WORKOUT TRACKER v3
+// Con Firebase Auth + Firestore
 // ============================================
+
+// === Firebase Configuration ===
+const firebaseConfig = {
+    apiKey: "AIzaSyCKCee_1RoJwtGOGQcgyrhNU-FJ7Z7bBEs",
+    authDomain: "fittrack-899e8.firebaseapp.com",
+    projectId: "fittrack-899e8",
+    storageBucket: "fittrack-899e8.firebasestorage.app",
+    messagingSenderId: "598492494330",
+    appId: "1:598492494330:web:cc8dbbfb71eb1be07b0c43",
+    measurementId: "G-FR1DHKDTTP"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+// Enable offline persistence
+db.enablePersistence().catch(function(err) {
+    console.log('Persistence error:', err.code);
+});
 
 // Register Service Worker
 if ('serviceWorker' in navigator) {
@@ -10,10 +31,8 @@ if ('serviceWorker' in navigator) {
 }
 
 // === Constants ===
-const STORAGE_KEY = 'fittrack_data';
 const JUMP_GOAL = 1000;
 const CALORIES_PER_JUMP = 0.14;
-const CALORIES_PER_EXERCISE = 25;
 
 // === Rewards System ===
 const REWARDS = [
@@ -48,36 +67,164 @@ let appData = {};
 let currentView = 'today';
 let calendarMonth = new Date().getMonth();
 let calendarYear = new Date().getFullYear();
+let currentUser = null;
 
 // === Initialize ===
 document.addEventListener('DOMContentLoaded', function() {
-    loadData();
     initSplashScreen();
-    initNavigation();
-    setTodayDate();
-    renderCurrentView();
+    initAuth();
 });
 
 // === Splash Screen ===
 function initSplashScreen() {
-    const splash = document.getElementById('splashScreen');
-    const app = document.getElementById('app');
     setTimeout(function() {
-        splash.classList.add('hidden');
-        app.classList.remove('hidden');
+        document.getElementById('splashScreen').classList.add('hidden');
     }, 1500);
+}
+
+// === Authentication ===
+function initAuth() {
+    // Listen for auth state changes
+    auth.onAuthStateChanged(function(user) {
+        if (user) {
+            currentUser = user;
+            showApp();
+            loadDataFromFirestore();
+        } else {
+            currentUser = null;
+            showAuthScreen();
+        }
+    });
+
+    // Login form
+    document.getElementById('authForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        loginUser();
+    });
+
+    // Register button
+    document.getElementById('btnRegister').addEventListener('click', function() {
+        registerUser();
+    });
+
+    // Logout button
+    document.getElementById('btnLogout').addEventListener('click', function() {
+        auth.signOut();
+    });
+}
+
+function loginUser() {
+    var email = document.getElementById('authEmail').value;
+    var password = document.getElementById('authPassword').value;
+    hideAuthError();
+
+    auth.signInWithEmailAndPassword(email, password)
+        .catch(function(error) {
+            showAuthError(getAuthErrorMessage(error.code));
+        });
+}
+
+function registerUser() {
+    var email = document.getElementById('authEmail').value;
+    var password = document.getElementById('authPassword').value;
+    hideAuthError();
+
+    if (password.length < 6) {
+        showAuthError('Password must be at least 6 characters');
+        return;
+    }
+
+    auth.createUserWithEmailAndPassword(email, password)
+        .catch(function(error) {
+            showAuthError(getAuthErrorMessage(error.code));
+        });
+}
+
+function getAuthErrorMessage(code) {
+    switch (code) {
+        case 'auth/user-not-found': return 'No account found. Click "Create Account"';
+        case 'auth/wrong-password': return 'Incorrect password';
+        case 'auth/email-already-in-use': return 'Email already registered. Try logging in';
+        case 'auth/weak-password': return 'Password must be at least 6 characters';
+        case 'auth/invalid-email': return 'Invalid email address';
+        case 'auth/too-many-requests': return 'Too many attempts. Try again later';
+        default: return 'An error occurred. Please try again';
+    }
+}
+
+function showAuthError(message) {
+    var errorEl = document.getElementById('authError');
+    errorEl.textContent = message;
+    errorEl.classList.remove('hidden');
+}
+
+function hideAuthError() {
+    document.getElementById('authError').classList.add('hidden');
+}
+
+function showAuthScreen() {
+    document.getElementById('authScreen').classList.remove('hidden');
+    document.getElementById('app').classList.add('hidden');
+}
+
+function showApp() {
+    document.getElementById('authScreen').classList.add('hidden');
+    document.getElementById('app').classList.remove('hidden');
+    initNavigation();
+    setTodayDate();
+}
+
+// === Firestore Data ===
+function loadDataFromFirestore() {
+    if (!currentUser) return;
+
+    db.collection('users').doc(currentUser.uid).collection('workouts')
+        .get()
+        .then(function(querySnapshot) {
+            appData = {};
+            querySnapshot.forEach(function(doc) {
+                appData[doc.id] = doc.data();
+            });
+            renderCurrentView();
+        })
+        .catch(function(error) {
+            console.log('Error loading data:', error);
+            // Fallback to localStorage
+            var saved = localStorage.getItem('fittrack_data_' + currentUser.uid);
+            if (saved) appData = JSON.parse(saved);
+            renderCurrentView();
+        });
+}
+
+function saveData() {
+    if (!currentUser) return;
+
+    var today = getTodayKey();
+    var dayData = appData[today];
+
+    if (dayData) {
+        // Save to Firestore
+        db.collection('users').doc(currentUser.uid).collection('workouts').doc(today)
+            .set(dayData)
+            .catch(function(error) {
+                console.log('Error saving to Firestore:', error);
+            });
+
+        // Also save to localStorage as backup
+        localStorage.setItem('fittrack_data_' + currentUser.uid, JSON.stringify(appData));
+    }
 }
 
 // === Set Today Date ===
 function setTodayDate() {
-    const today = new Date();
-    const options = { weekday: 'long', day: 'numeric', month: 'short' };
+    var today = new Date();
+    var options = { weekday: 'long', day: 'numeric', month: 'short' };
     document.getElementById('todayDate').textContent = today.toLocaleDateString('en-US', options);
 }
 
 // === Navigation ===
 function initNavigation() {
-    const navBtns = document.querySelectorAll('.nav-btn');
+    var navBtns = document.querySelectorAll('.nav-btn');
     navBtns.forEach(function(btn) {
         btn.addEventListener('click', function() {
             navBtns.forEach(function(b) { b.classList.remove('active'); });
@@ -90,7 +237,7 @@ function initNavigation() {
 
 // === Render Views ===
 function renderCurrentView() {
-    const content = document.getElementById('content');
+    var content = document.getElementById('content');
     switch (currentView) {
         case 'today': renderTodayView(content); break;
         case 'exercises': renderCalendarView(content); break;
@@ -101,19 +248,19 @@ function renderCurrentView() {
 
 // === TODAY VIEW ===
 function renderTodayView(container) {
-    const today = getTodayKey();
-    const dayData = getDayData(today);
-    const jumpCount = dayData.jumpCount || 0;
-    const jumpPercent = Math.min((jumpCount / JUMP_GOAL) * 100, 100);
-    const jumpStatus = dayData.jumpCompleted ? 'complete' : (dayData.jumpStartTime ? 'active' : 'pending');
-    const streak = calculateStreak();
+    var today = getTodayKey();
+    var dayData = getDayData(today);
+    var jumpCount = dayData.jumpCount || 0;
+    var jumpPercent = Math.min((jumpCount / JUMP_GOAL) * 100, 100);
+    var jumpStatus = dayData.jumpCompleted ? 'complete' : (dayData.jumpStartTime ? 'active' : 'pending');
+    var streak = calculateStreak();
 
-    let statusBadge = '';
+    var statusBadge = '';
     if (jumpStatus === 'pending') statusBadge = '<span class="jump-card-badge badge-pending">Pending</span>';
     else if (jumpStatus === 'active') statusBadge = '<span class="jump-card-badge badge-active">In Progress</span>';
     else statusBadge = '<span class="jump-card-badge badge-complete">✓ Done</span>';
 
-    let html = '<div class="fade-in">';
+    var html = '<div class="fade-in">';
 
     // Streak Banner
     if (streak > 0) {
@@ -139,18 +286,9 @@ function renderTodayView(container) {
 
     // Time info
     html += '  <div class="jump-time-info">';
-    html += '    <div class="time-block">';
-    html += '      <div class="time-label">Started</div>';
-    html += '      <div class="time-value">' + (dayData.jumpStartTime || '--:--') + '</div>';
-    html += '    </div>';
-    html += '    <div class="time-block">';
-    html += '      <div class="time-label">Finished</div>';
-    html += '      <div class="time-value">' + (dayData.jumpEndTime || '--:--') + '</div>';
-    html += '    </div>';
-    html += '    <div class="time-block">';
-    html += '      <div class="time-label">Duration</div>';
-    html += '      <div class="time-value">' + (dayData.jumpDuration || '--:--') + '</div>';
-    html += '    </div>';
+    html += '    <div class="time-block"><div class="time-label">Started</div><div class="time-value">' + (dayData.jumpStartTime || '--:--') + '</div></div>';
+    html += '    <div class="time-block"><div class="time-label">Finished</div><div class="time-value">' + (dayData.jumpEndTime || '--:--') + '</div></div>';
+    html += '    <div class="time-block"><div class="time-label">Duration</div><div class="time-value">' + (dayData.jumpDuration || '--:--') + '</div></div>';
     html += '  </div>';
 
     // Buttons
@@ -169,13 +307,11 @@ function renderTodayView(container) {
     // Today's Exercises
     html += '<div class="exercise-section-title">Today\'s Exercises</div>';
 
-    const todayExercises = getTodayExercises();
+    var todayExercises = getTodayExercises();
     todayExercises.forEach(function(exercise) {
-        const isCompleted = dayData.exercises && dayData.exercises[exercise.id];
+        var isCompleted = dayData.exercises && dayData.exercises[exercise.id];
         html += '<div class="exercise-card ' + (isCompleted ? 'completed' : '') + '" data-exercise-id="' + exercise.id + '">';
-        html += '  <div class="exercise-checkbox">';
-        html += '    <span class="exercise-check-icon">✓</span>';
-        html += '  </div>';
+        html += '  <div class="exercise-checkbox"><span class="exercise-check-icon">✓</span></div>';
         html += '  <div class="exercise-info">';
         html += '    <div class="exercise-name">' + exercise.name + '</div>';
         html += '    <div class="exercise-detail">' + exercise.reps + ' • ~' + exercise.calPerSet + ' cal</div>';
@@ -187,7 +323,7 @@ function renderTodayView(container) {
     });
 
     // Today's calories
-    const todayCal = calculateDayCalories(dayData);
+    var todayCal = calculateDayCalories(dayData);
     if (todayCal > 0) {
         html += '<div class="calories-card">';
         html += '  <div class="calories-header">🔥 Calories Burned Today</div>';
@@ -200,19 +336,13 @@ function renderTodayView(container) {
 
     // Event Listeners
     var btnStart = document.getElementById('btnStartJump');
-    if (btnStart) {
-        btnStart.addEventListener('click', function() { startJumping(); });
-    }
+    if (btnStart) btnStart.addEventListener('click', function() { startJumping(); });
 
     var btnAdd = document.getElementById('btnAddJumps');
-    if (btnAdd) {
-        btnAdd.addEventListener('click', function() { addJumps(); });
-    }
+    if (btnAdd) btnAdd.addEventListener('click', function() { addJumps(); });
 
     var btnFinish = document.getElementById('btnFinishJump');
-    if (btnFinish) {
-        btnFinish.addEventListener('click', function() { finishJumping(); });
-    }
+    if (btnFinish) btnFinish.addEventListener('click', function() { finishJumping(); });
 
     var exerciseCards = container.querySelectorAll('.exercise-card');
     exerciseCards.forEach(function(card) {
@@ -226,16 +356,16 @@ function renderTodayView(container) {
 
 // === CALENDAR VIEW ===
 function renderCalendarView(container) {
-    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+    var monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
         'July', 'August', 'September', 'October', 'November', 'December'];
-    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    var dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-    const today = new Date();
-    const todayKey = getTodayKey();
-    const firstDay = new Date(calendarYear, calendarMonth, 1).getDay();
-    const daysInMonth = new Date(calendarYear, calendarMonth + 1, 0).getDate();
+    var today = new Date();
+    var todayKey = getTodayKey();
+    var firstDay = new Date(calendarYear, calendarMonth, 1).getDay();
+    var daysInMonth = new Date(calendarYear, calendarMonth + 1, 0).getDate();
 
-    let html = '<div class="fade-in">';
+    var html = '<div class="fade-in">';
 
     // Calendar Header
     html += '<div class="calendar-header">';
@@ -250,7 +380,7 @@ function renderCalendarView(container) {
         html += '<div class="calendar-day-name">' + day + '</div>';
     });
 
-    // Empty cells before first day
+    // Empty cells
     for (var i = 0; i < firstDay; i++) {
         html += '<div class="calendar-cell empty"></div>';
     }
@@ -265,20 +395,13 @@ function renderCalendarView(container) {
 
         if (isToday) cellClass += ' today';
         if (isFuture) cellClass += ' future';
+        if (dayData && dayData.jumpCompleted) cellClass += ' complete';
+        else if (dayData && dayData.jumpCount > 0) cellClass += ' partial';
 
-        if (dayData && dayData.jumpCompleted) {
-            cellClass += ' complete';
-        } else if (dayData && dayData.jumpCount > 0) {
-            cellClass += ' partial';
-        }
-
-        html += '<div class="' + cellClass + '" data-date="' + dateKey + '">';
+        html += '<div class="' + cellClass + '">';
         html += '  <span class="calendar-day-number">' + d + '</span>';
-        if (dayData && dayData.jumpCompleted) {
-            html += '  <span class="calendar-day-icon">✓</span>';
-        } else if (dayData && dayData.jumpCount > 0) {
-            html += '  <span class="calendar-day-icon">◐</span>';
-        }
+        if (dayData && dayData.jumpCompleted) html += '  <span class="calendar-day-icon">✓</span>';
+        else if (dayData && dayData.jumpCount > 0) html += '  <span class="calendar-day-icon">◐</span>';
         html += '</div>';
     }
 
@@ -291,7 +414,7 @@ function renderCalendarView(container) {
     html += '  <div class="legend-item"><span class="legend-dot today-dot"></span> Today</div>';
     html += '</div>';
 
-    // Weekly Reward Section
+    // Weekly Reward
     var weeklyData = getWeeklyData();
     html += '<div class="reward-card">';
     html += '  <div class="reward-header">🏆 Weekly Reward</div>';
@@ -299,41 +422,27 @@ function renderCalendarView(container) {
     html += '    <div class="reward-days">' + weeklyData.completedDays + '/5 days completed</div>';
     html += '    <div class="reward-progress-bar"><div class="reward-progress-fill" style="width: ' + (weeklyData.completedDays / 5 * 100) + '%"></div></div>';
     html += '  </div>';
-    html += '  <div class="reward-calories">';
-    html += '    <span class="reward-cal-number">' + weeklyData.totalCalories + '</span>';
-    html += '    <span class="reward-cal-label">calories burned this week</span>';
-    html += '  </div>';
+    html += '  <div class="reward-calories"><span class="reward-cal-number">' + weeklyData.totalCalories + '</span><span class="reward-cal-label">calories burned this week</span></div>';
 
     if (weeklyData.completedDays >= 5) {
         html += '  <div class="reward-unlocked">';
         html += '    <div class="reward-unlocked-title">🎉 Reward Unlocked!</div>';
-        html += '    <div class="reward-unlocked-text">You earned a treat! You burned ' + weeklyData.totalCalories + ' cal this week.</div>';
+        html += '    <div class="reward-unlocked-text">You burned ' + weeklyData.totalCalories + ' cal this week. You earned a treat!</div>';
         html += '    <div class="reward-options">';
         REWARDS.forEach(function(reward) {
             if (weeklyData.totalCalories >= reward.calories) {
-                html += '      <div class="reward-option">';
-                html += '        <span class="reward-emoji">' + reward.emoji + '</span>';
-                html += '        <span class="reward-name">' + reward.name + '</span>';
-                html += '        <span class="reward-desc">' + reward.description + '</span>';
-                html += '      </div>';
+                html += '      <div class="reward-option"><span class="reward-emoji">' + reward.emoji + '</span><span class="reward-name">' + reward.name + '</span><span class="reward-desc">' + reward.description + '</span></div>';
             }
         });
-        html += '    </div>';
-        html += '  </div>';
+        html += '    </div></div>';
     } else {
         var remaining = 5 - weeklyData.completedDays;
-        html += '  <div class="reward-locked">';
-        html += '    <span class="reward-locked-icon">🔒</span>';
-        html += '    <span class="reward-locked-text">' + remaining + ' more day' + (remaining > 1 ? 's' : '') + ' to unlock your reward!</span>';
-        html += '  </div>';
+        html += '  <div class="reward-locked"><span class="reward-locked-icon">🔒</span><span class="reward-locked-text">' + remaining + ' more day' + (remaining > 1 ? 's' : '') + ' to unlock your reward!</span></div>';
     }
 
-    html += '</div>';
-    html += '</div>';
-
+    html += '</div></div>';
     container.innerHTML = html;
 
-    // Calendar navigation
     document.getElementById('prevMonth').addEventListener('click', function() {
         calendarMonth--;
         if (calendarMonth < 0) { calendarMonth = 11; calendarYear--; }
@@ -349,15 +458,11 @@ function renderCalendarView(container) {
 
 // === HISTORY VIEW ===
 function renderHistoryView(container) {
-    const days = Object.keys(appData).sort().reverse();
-
-    let html = '<div class="fade-in">';
+    var days = Object.keys(appData).sort().reverse();
+    var html = '<div class="fade-in">';
 
     if (days.length === 0) {
-        html += '<div class="empty-state">';
-        html += '  <div class="empty-state-icon">📅</div>';
-        html += '  <div class="empty-state-text">No history yet. Start your first workout!</div>';
-        html += '</div>';
+        html += '<div class="empty-state"><div class="empty-state-icon">📅</div><div class="empty-state-text">No history yet. Start your first workout!</div></div>';
     } else {
         days.forEach(function(day) {
             var data = appData[day];
@@ -368,41 +473,25 @@ function renderHistoryView(container) {
             var dayCal = calculateDayCalories(data);
 
             html += '<div class="history-day">';
-            html += '  <div class="history-day-header">';
-            html += '    <span class="history-date">' + dateStr + '</span>';
-            if (isComplete) {
-                html += '    <span class="history-badge badge-complete">✓ ' + jumpCount + ' jumps</span>';
-            } else if (jumpCount > 0) {
-                html += '    <span class="history-badge badge-pending">' + jumpCount + '/' + JUMP_GOAL + '</span>';
-            } else {
-                html += '    <span class="history-badge badge-pending">No jumps</span>';
-            }
-            html += '  </div>';
+            html += '  <div class="history-day-header"><span class="history-date">' + dateStr + '</span>';
+            if (isComplete) html += '<span class="history-badge badge-complete">✓ ' + jumpCount + ' jumps</span>';
+            else if (jumpCount > 0) html += '<span class="history-badge badge-pending">' + jumpCount + '/' + JUMP_GOAL + '</span>';
+            else html += '<span class="history-badge badge-pending">No jumps</span>';
+            html += '</div>';
 
-            if (data.jumpStartTime) {
-                html += '  <div class="history-detail"><span>Started:</span><span>' + data.jumpStartTime + '</span></div>';
-            }
-            if (data.jumpEndTime) {
-                html += '  <div class="history-detail"><span>Finished:</span><span>' + data.jumpEndTime + '</span></div>';
-            }
-            if (data.jumpDuration) {
-                html += '  <div class="history-detail"><span>Duration:</span><span>' + data.jumpDuration + '</span></div>';
-            }
-            if (dayCal > 0) {
-                html += '  <div class="history-detail"><span>Calories:</span><span>🔥 ' + dayCal + ' cal</span></div>';
-            }
+            if (data.jumpStartTime) html += '<div class="history-detail"><span>Started:</span><span>' + data.jumpStartTime + '</span></div>';
+            if (data.jumpEndTime) html += '<div class="history-detail"><span>Finished:</span><span>' + data.jumpEndTime + '</span></div>';
+            if (data.jumpDuration) html += '<div class="history-detail"><span>Duration:</span><span>' + data.jumpDuration + '</span></div>';
+            if (dayCal > 0) html += '<div class="history-detail"><span>Calories:</span><span>🔥 ' + dayCal + ' cal</span></div>';
 
             if (data.exercises && Object.keys(data.exercises).length > 0) {
-                html += '  <div class="history-exercises">';
+                html += '<div class="history-exercises">';
                 Object.keys(data.exercises).forEach(function(exId) {
                     var exercise = EXERCISES.find(function(e) { return e.id === exId; });
-                    if (exercise) {
-                        html += '    <div class="history-exercise-item">✅ ' + exercise.name + ' — ' + data.exercises[exId] + '</div>';
-                    }
+                    if (exercise) html += '<div class="history-exercise-item">✅ ' + exercise.name + ' — ' + data.exercises[exId] + '</div>';
                 });
-                html += '  </div>';
+                html += '</div>';
             }
-
             html += '</div>';
         });
     }
@@ -413,53 +502,38 @@ function renderHistoryView(container) {
 
 // === STATS VIEW ===
 function renderStatsView(container) {
-    const days = Object.keys(appData);
-    const totalDays = days.length;
-    const completedDays = days.filter(function(d) { return appData[d].jumpCompleted; }).length;
-    const totalJumps = days.reduce(function(sum, d) { return sum + (appData[d].jumpCount || 0); }, 0);
-    const totalExercises = days.reduce(function(sum, d) {
-        return sum + (appData[d].exercises ? Object.keys(appData[d].exercises).length : 0);
-    }, 0);
-    const totalCalories = days.reduce(function(sum, d) { return sum + calculateDayCalories(appData[d]); }, 0);
-    const streak = calculateStreak();
+    var days = Object.keys(appData);
+    var totalDays = days.length;
+    var completedDays = days.filter(function(d) { return appData[d].jumpCompleted; }).length;
+    var totalJumps = days.reduce(function(sum, d) { return sum + (appData[d].jumpCount || 0); }, 0);
+    var totalExercises = days.reduce(function(sum, d) { return sum + (appData[d].exercises ? Object.keys(appData[d].exercises).length : 0); }, 0);
+    var totalCalories = days.reduce(function(sum, d) { return sum + calculateDayCalories(appData[d]); }, 0);
+    var streak = calculateStreak();
 
-    let html = '<div class="fade-in">';
+    var html = '<div class="fade-in">';
 
-    // Streak Card
-    html += '<div class="streak-card">';
-    html += '  <div class="streak-number">' + streak + ' 🔥</div>';
-    html += '  <div class="streak-label">Day Streak</div>';
-    html += '  <div class="streak-message">' + getStreakMessage(streak) + '</div>';
-    html += '</div>';
+    html += '<div class="streak-card"><div class="streak-number">' + streak + ' 🔥</div><div class="streak-label">Day Streak</div><div class="streak-message">' + getStreakMessage(streak) + '</div></div>';
 
-    // Stats Grid
     html += '<div class="stats-grid">';
-    html += '  <div class="stats-card"><div class="stats-card-number">' + totalJumps.toLocaleString() + '</div><div class="stats-card-label">Total Jumps</div></div>';
-    html += '  <div class="stats-card"><div class="stats-card-number">' + completedDays + '</div><div class="stats-card-label">Days Completed</div></div>';
-    html += '  <div class="stats-card"><div class="stats-card-number">' + totalCalories.toLocaleString() + '</div><div class="stats-card-label">Total Calories</div></div>';
-    html += '  <div class="stats-card"><div class="stats-card-number">' + totalExercises + '</div><div class="stats-card-label">Exercises Done</div></div>';
+    html += '<div class="stats-card"><div class="stats-card-number">' + totalJumps.toLocaleString() + '</div><div class="stats-card-label">Total Jumps</div></div>';
+    html += '<div class="stats-card"><div class="stats-card-number">' + completedDays + '</div><div class="stats-card-label">Days Completed</div></div>';
+    html += '<div class="stats-card"><div class="stats-card-number">' + totalCalories.toLocaleString() + '</div><div class="stats-card-label">Total Calories</div></div>';
+    html += '<div class="stats-card"><div class="stats-card-number">' + totalExercises + '</div><div class="stats-card-label">Exercises Done</div></div>';
     html += '</div>';
 
-    // Averages
     var avgJumps = totalDays > 0 ? Math.round(totalJumps / totalDays) : 0;
     var avgCal = totalDays > 0 ? Math.round(totalCalories / totalDays) : 0;
     html += '<div class="stats-grid">';
-    html += '  <div class="stats-card"><div class="stats-card-number">' + avgJumps + '</div><div class="stats-card-label">Avg Jumps/Day</div></div>';
-    html += '  <div class="stats-card"><div class="stats-card-number">' + avgCal + '</div><div class="stats-card-label">Avg Cal/Day</div></div>';
+    html += '<div class="stats-card"><div class="stats-card-number">' + avgJumps + '</div><div class="stats-card-label">Avg Jumps/Day</div></div>';
+    html += '<div class="stats-card"><div class="stats-card-number">' + avgCal + '</div><div class="stats-card-label">Avg Cal/Day</div></div>';
     html += '</div>';
 
-    // Food equivalents
     if (totalCalories > 0) {
         html += '<div class="exercise-section-title">🍔 You\'ve Earned</div>';
         REWARDS.forEach(function(reward) {
             var times = Math.floor(totalCalories / reward.calories);
             if (times > 0) {
-                html += '<div class="exercise-card">';
-                html += '  <div class="exercise-info">';
-                html += '    <div class="exercise-name">' + reward.emoji + ' ' + times + 'x ' + reward.name + '</div>';
-                html += '    <div class="exercise-detail">' + (times * reward.calories) + ' cal equivalent</div>';
-                html += '  </div>';
-                html += '</div>';
+                html += '<div class="exercise-card"><div class="exercise-info"><div class="exercise-name">' + reward.emoji + ' ' + times + 'x ' + reward.name + '</div><div class="exercise-detail">' + (times * reward.calories) + ' cal equivalent</div></div></div>';
             }
         });
     }
@@ -470,8 +544,8 @@ function renderStatsView(container) {
 
 // === Jump Functions ===
 function startJumping() {
-    const today = getTodayKey();
-    const dayData = getDayData(today);
+    var today = getTodayKey();
+    var dayData = getDayData(today);
     dayData.jumpStartTime = getCurrentTime();
     dayData.jumpCount = dayData.jumpCount || 0;
     appData[today] = dayData;
@@ -480,13 +554,13 @@ function startJumping() {
 }
 
 function addJumps() {
-    const input = prompt('How many jumps did you do?', '100');
+    var input = prompt('How many jumps did you do?', '100');
     if (input === null) return;
-    const jumps = parseInt(input);
+    var jumps = parseInt(input);
     if (isNaN(jumps) || jumps <= 0) return;
 
-    const today = getTodayKey();
-    const dayData = getDayData(today);
+    var today = getTodayKey();
+    var dayData = getDayData(today);
     dayData.jumpCount = (dayData.jumpCount || 0) + jumps;
 
     if (dayData.jumpCount >= JUMP_GOAL) {
@@ -502,11 +576,11 @@ function addJumps() {
 }
 
 function finishJumping() {
-    const today = getTodayKey();
-    const dayData = getDayData(today);
+    var today = getTodayKey();
+    var dayData = getDayData(today);
 
     if (dayData.jumpCount < JUMP_GOAL) {
-        const remaining = JUMP_GOAL - dayData.jumpCount;
+        var remaining = JUMP_GOAL - dayData.jumpCount;
         if (!confirm('You have ' + remaining + ' jumps remaining. Mark as complete anyway?')) return;
     }
 
@@ -520,8 +594,8 @@ function finishJumping() {
 
 // === Exercise Functions ===
 function toggleExercise(exerciseId) {
-    const today = getTodayKey();
-    const dayData = getDayData(today);
+    var today = getTodayKey();
+    var dayData = getDayData(today);
     if (!dayData.exercises) dayData.exercises = {};
 
     if (dayData.exercises[exerciseId]) {
@@ -535,11 +609,11 @@ function toggleExercise(exerciseId) {
 }
 
 function getTodayExercises() {
-    const today = new Date();
-    const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / 86400000);
-    const startIndex = (dayOfYear * 6) % EXERCISES.length;
-    let exercises = [];
-    for (let i = 0; i < 6; i++) {
+    var today = new Date();
+    var dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / 86400000);
+    var startIndex = (dayOfYear * 6) % EXERCISES.length;
+    var exercises = [];
+    for (var i = 0; i < 6; i++) {
         exercises.push(EXERCISES[(startIndex + i) % EXERCISES.length]);
     }
     return exercises;
@@ -547,10 +621,8 @@ function getTodayExercises() {
 
 // === Calories ===
 function calculateDayCalories(dayData) {
-    let cal = 0;
-    if (dayData.jumpCount) {
-        cal += Math.round(dayData.jumpCount * CALORIES_PER_JUMP);
-    }
+    var cal = 0;
+    if (dayData.jumpCount) cal += Math.round(dayData.jumpCount * CALORIES_PER_JUMP);
     if (dayData.exercises) {
         Object.keys(dayData.exercises).forEach(function(exId) {
             var exercise = EXERCISES.find(function(e) { return e.id === exId; });
@@ -562,13 +634,13 @@ function calculateDayCalories(dayData) {
 
 // === Weekly Data ===
 function getWeeklyData() {
-    const today = new Date();
-    const dayOfWeek = today.getDay();
-    const monday = new Date(today);
+    var today = new Date();
+    var dayOfWeek = today.getDay();
+    var monday = new Date(today);
     monday.setDate(today.getDate() - ((dayOfWeek + 6) % 7));
 
-    let completedDays = 0;
-    let totalCalories = 0;
+    var completedDays = 0;
+    var totalCalories = 0;
 
     for (var i = 0; i < 7; i++) {
         var checkDate = new Date(monday);
@@ -585,8 +657,8 @@ function getWeeklyData() {
 
 // === Streak ===
 function calculateStreak() {
-    let streak = 0;
-    let checkDate = new Date();
+    var streak = 0;
+    var checkDate = new Date();
 
     while (true) {
         var key = checkDate.toISOString().split('T')[0];
@@ -620,28 +692,18 @@ function getDayData(dateKey) {
 }
 
 function getCurrentTime() {
-    const now = new Date();
+    var now = new Date();
     return String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
 }
 
 function calculateDuration(startTime, endTime) {
-    const start = startTime.split(':');
-    const end = endTime.split(':');
-    let diff = (parseInt(end[0]) * 60 + parseInt(end[1])) - (parseInt(start[0]) * 60 + parseInt(start[1]));
+    var start = startTime.split(':');
+    var end = endTime.split(':');
+    var diff = (parseInt(end[0]) * 60 + parseInt(end[1])) - (parseInt(start[0]) * 60 + parseInt(start[1]));
     if (diff < 0) diff += 1440;
-    const hours = Math.floor(diff / 60);
-    const mins = diff % 60;
+    var hours = Math.floor(diff / 60);
+    var mins = diff % 60;
     if (hours > 0) return hours + 'h ' + mins + 'min';
     return mins + ' min';
-}
-
-// === Storage ===
-function saveData() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
-}
-
-function loadData() {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) appData = JSON.parse(saved);
 }
 
