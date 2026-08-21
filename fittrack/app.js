@@ -346,12 +346,13 @@ function renderTodayView(container) {
     todayExercises.forEach(function(ex) { let done = dayData.exercises && dayData.exercises[ex.id]; let name = currentLang==='es'?ex.nameEs:ex.name; let reps = currentLang==='es'?ex.repsEs:ex.reps; html += '<div class="exercise-card' + (done?' completed':'') + '" data-exercise-id="' + ex.id + '"><div class="exercise-checkbox"><span class="exercise-check-icon">✓</span></div><div class="exercise-info"><div class="exercise-name">' + ex.emoji + ' ' + name + '</div><div class="exercise-detail">' + reps + ' • ' + ex.calPerSet + ' ' + t('cal') + '</div></div>' + (done?'<div class="exercise-time">' + dayData.exercises[ex.id] + '</div>':'') + '<button class="exercise-video-btn" data-exercise-id="' + ex.id + '">?</button></div>'; });
     let todayCal = calculateDayCalories(dayData);
     if (todayCal > 0) html += '<div class="calories-card"><div class="calories-header">🔥 ' + t('caloriesBurned') + '</div><div class="calories-number">' + todayCal + ' ' + t('cal') + '</div></div>';
+    html += '<div class="music-card"><div class="music-card-title">🎵 Workout Music</div><div class="music-buttons"><button class="music-btn spotify" id="btnSpotify">🟢 Spotify</button><button class="music-btn apple" id="btnAppleMusic">🍎 Apple Music</button></div></div>';
+    html += '</div>'; container.innerHTML = html;
+    var bs = document.getElementById('btnStartJump'); if (bs) bs.addEventListener('click', startJumping);
+    var ba = document.getElementById('btnAddJumps'); if (ba) ba.addEventListener('click', addJumps);
+    var bf = document.getElementById('btnFinishJump'); if (bf) bf.addEventListener('click', finishJumping);
     var bsp = document.getElementById('btnSpotify'); if (bsp) bsp.addEventListener('click', function() { window.open('https://open.spotify.com/playlist/37i9dQZF1DX76Wlfdnj7AP', '_blank'); });
     var bam2 = document.getElementById('btnAppleMusic'); if (bam2) bam2.addEventListener('click', function() { window.open('https://music.apple.com/us/playlist/workout-beats/pl.7e3e9e1b2e4d4e5f', '_blank'); });
-    html += '</div>'; container.innerHTML = html;
-    let bs = document.getElementById('btnStartJump'); if (bs) bs.addEventListener('click', startJumping);
-    let ba = document.getElementById('btnAddJumps'); if (ba) ba.addEventListener('click', addJumps);
-    let bf = document.getElementById('btnFinishJump'); if (bf) bf.addEventListener('click', finishJumping);
     container.querySelectorAll('.exercise-card').forEach(function(card) { card.querySelector('.exercise-checkbox').addEventListener('click', function() { toggleExercise(card.getAttribute('data-exercise-id')); renderCurrentView(); }); });
     container.querySelectorAll('.exercise-video-btn').forEach(function(btn) { btn.addEventListener('click', function(e) { e.stopPropagation(); let ex = ALL_EXERCISES.find(function(x) { return x.id === btn.getAttribute('data-exercise-id'); }); if (ex) openExerciseModal(ex); }); });
 }
