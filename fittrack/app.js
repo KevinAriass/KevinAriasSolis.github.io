@@ -351,8 +351,8 @@ function renderTodayView(container) {
     var bs = document.getElementById('btnStartJump'); if (bs) bs.addEventListener('click', startJumping);
     var ba = document.getElementById('btnAddJumps'); if (ba) ba.addEventListener('click', addJumps);
     var bf = document.getElementById('btnFinishJump'); if (bf) bf.addEventListener('click', finishJumping);
-    var bsp = document.getElementById('btnSpotify'); if (bsp) bsp.addEventListener('click', function() { window.open('https://open.spotify.com/playlist/37i9dQZF1DX76Wlfdnj7AP', '_blank'); });
-    var bam2 = document.getElementById('btnAppleMusic'); if (bam2) bam2.addEventListener('click', function() { window.open('https://music.apple.com/us/playlist/workout-beats/pl.7e3e9e1b2e4d4e5f', '_blank'); });
+    var bsp = document.getElementById('btnSpotify'); if (bsp) bsp.addEventListener('click', function() { window.open('https://open.spotify.com', '_blank'); });
+    var bam2 = document.getElementById('btnAppleMusic'); if (bam2) bam2.addEventListener('click', function() { window.open('https://music.apple.com', '_blank'); });
     container.querySelectorAll('.exercise-card').forEach(function(card) { card.querySelector('.exercise-checkbox').addEventListener('click', function() { toggleExercise(card.getAttribute('data-exercise-id')); renderCurrentView(); }); });
     container.querySelectorAll('.exercise-video-btn').forEach(function(btn) { btn.addEventListener('click', function(e) { e.stopPropagation(); let ex = ALL_EXERCISES.find(function(x) { return x.id === btn.getAttribute('data-exercise-id'); }); if (ex) openExerciseModal(ex); }); });
 }
