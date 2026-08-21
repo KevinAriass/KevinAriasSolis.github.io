@@ -2079,4 +2079,58 @@ input[type="date"].auth-input::-webkit-calendar-picker-indicator {
     font-size: 14px;
 }
 
+/* === Music Card === */
+.music-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    margin-top: 20px;
+    border: 1px solid var(--border-subtle);
+    text-align: center;
+}
+
+.music-card-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 14px;
+}
+
+.music-buttons {
+    display: flex;
+    gap: 12px;
+}
+
+.music-btn {
+    flex: 1;
+    padding: 14px 16px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-subtle);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.music-btn.spotify {
+    background: rgba(30, 215, 96, 0.1);
+    color: #1ed760;
+    border-color: rgba(30, 215, 96, 0.3);
+}
+
+.music-btn.spotify:active {
+    background: rgba(30, 215, 96, 0.2);
+    transform: scale(0.95);
+}
+
+.music-btn.apple {
+    background: rgba(252, 60, 68, 0.1);
+    color: #fc3c44;
+    border-color: rgba(252, 60, 68, 0.3);
+}
+
+.music-btn.apple:active {
+    background: rgba(252, 60, 68, 0.2);
+    transform: scale(0.95);
+}
 
