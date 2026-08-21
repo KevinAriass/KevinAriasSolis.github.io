@@ -346,7 +346,6 @@ function renderTodayView(container) {
     todayExercises.forEach(function(ex) { let done = dayData.exercises && dayData.exercises[ex.id]; let name = currentLang==='es'?ex.nameEs:ex.name; let reps = currentLang==='es'?ex.repsEs:ex.reps; html += '<div class="exercise-card' + (done?' completed':'') + '" data-exercise-id="' + ex.id + '"><div class="exercise-checkbox"><span class="exercise-check-icon">✓</span></div><div class="exercise-info"><div class="exercise-name">' + ex.emoji + ' ' + name + '</div><div class="exercise-detail">' + reps + ' • ' + ex.calPerSet + ' ' + t('cal') + '</div></div>' + (done?'<div class="exercise-time">' + dayData.exercises[ex.id] + '</div>':'') + '<button class="exercise-video-btn" data-exercise-id="' + ex.id + '">?</button></div>'; });
     let todayCal = calculateDayCalories(dayData);
     if (todayCal > 0) html += '<div class="calories-card"><div class="calories-header">🔥 ' + t('caloriesBurned') + '</div><div class="calories-number">' + todayCal + ' ' + t('cal') + '</div></div>';
-    html += '<div class="music-card"><div class="music-card-title">🎵 Workout Music</div><div class="music-buttons"><button class="music-btn spotify" id="btnSpotify">🟢 Spotify</button><button class="music-btn apple" id="btnAppleMusic">🍎 Apple Music</button></div></div>';
     var waterGoal = profileData.weight ? Math.round(profileData.weight * 35) : 2500;
     var waterData = getDayData(today).water || 0;
     var waterPercent = Math.min((waterData / waterGoal) * 100, 100);
@@ -356,6 +355,7 @@ function renderTodayView(container) {
     html += '<div class="water-glasses">' + waterGlasses + ' ' + (currentLang==='es'?'vasos':'glasses') + ' 🥤</div>';
     html += '<div class="water-buttons"><button class="water-btn" data-amount="250">+250ml</button><button class="water-btn" data-amount="500">+500ml</button><button class="water-btn" data-amount="750">+750ml</button></div>';
     html += '<div class="water-tip">💡 ' + (currentLang==='es'?'Recomendado: peso (kg) × 35ml':'Recommended: weight (kg) × 35ml') + '</div></div>';
+    html += '<div class="music-card"><div class="music-card-title">🎵 Workout Music</div><div class="music-buttons"><button class="music-btn spotify" id="btnSpotify">🟢 Spotify</button><button class="music-btn apple" id="btnAppleMusic">🍎 Apple Music</button></div></div>';
     html += '</div>'; container.innerHTML = html;
     var bs = document.getElementById('btnStartJump'); if (bs) bs.addEventListener('click', startJumping);
     var ba = document.getElementById('btnAddJumps'); if (ba) ba.addEventListener('click', addJumps);
