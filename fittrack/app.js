@@ -498,7 +498,13 @@ function calculateDayCalories(d) { let c=0; if(d.jumpCount)c+=Math.round(d.jumpC
 function getWeeklyData() { let today=new Date(); let dow=today.getDay(); let mon=new Date(today); mon.setDate(today.getDate()-((dow+6)%7)); let cd=0,tc=0; for(let i=0;i<7;i++){let ck=new Date(mon);ck.setDate(mon.getDate()+i);let k=ck.toISOString().split('T')[0];if(appData[k]){if(appData[k].jumpCompleted)cd++;tc+=calculateDayCalories(appData[k]);}} return{completedDays:cd,totalCalories:tc}; }
 function calculateStreak() { let s=0; let d=new Date(); while(true){let k=d.toISOString().split('T')[0]; if(appData[k]&&appData[k].jumpCompleted){s++;d.setDate(d.getDate()-1);}else break;} return s; }
 function getStreakMessage(s) { if(s===0)return t('startToday'); if(s<3)return t('goodStart'); if(s<7)return t('onFire'); if(s<14)return t('oneWeekStrong'); if(s<30)return t('unstoppable'); if(s<60)return t('legend'); return t('machine'); }
-function getTodayKey() { return new Date().toISOString().split('T')[0]; }
+function getTodayKey() {
+    var now = new Date();
+    var year = now.getFullYear();
+    var month = String(now.getMonth() + 1).padStart(2, '0');
+    var day = String(now.getDate()).padStart(2, '0');
+    return year + '-' + month + '-' + day;
+}
 function getDayData(key) { return appData[key] || {}; }
 function getCurrentTime() { let n=new Date(); return String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0'); }
 function calculateDuration(s,e) { let st=s.split(':'),en=e.split(':'); let diff=(parseInt(en[0])*60+parseInt(en[1]))-(parseInt(st[0])*60+parseInt(st[1])); if(diff<0)diff+=1440; let h=Math.floor(diff/60),m=diff%60; return h>0?h+'h '+m+'min':m+' min'; }
