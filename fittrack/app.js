@@ -347,6 +347,15 @@ function renderTodayView(container) {
     let todayCal = calculateDayCalories(dayData);
     if (todayCal > 0) html += '<div class="calories-card"><div class="calories-header">🔥 ' + t('caloriesBurned') + '</div><div class="calories-number">' + todayCal + ' ' + t('cal') + '</div></div>';
     html += '<div class="music-card"><div class="music-card-title">🎵 Workout Music</div><div class="music-buttons"><button class="music-btn spotify" id="btnSpotify">🟢 Spotify</button><button class="music-btn apple" id="btnAppleMusic">🍎 Apple Music</button></div></div>';
+    var waterGoal = profileData.weight ? Math.round(profileData.weight * 35) : 2500;
+    var waterData = getDayData(today).water || 0;
+    var waterPercent = Math.min((waterData / waterGoal) * 100, 100);
+    var waterGlasses = Math.floor(waterData / 250);
+    html += '<div class="water-card"><div class="water-card-header"><span class="water-card-title">💧 ' + (currentLang==='es'?'Hidratación':'Hydration') + '</span><span class="water-goal-badge">' + (currentLang==='es'?'Meta':'Goal') + ': ' + waterGoal + 'ml</span></div>';
+    html += '<div class="water-progress-container"><div class="water-progress-circle"><div class="water-progress-fill" style="height:' + waterPercent + '%"></div><div class="water-progress-text"><span class="water-current">' + waterData + '</span><span class="water-unit">/ ' + waterGoal + ' ml</span></div></div></div>';
+    html += '<div class="water-glasses">' + waterGlasses + ' ' + (currentLang==='es'?'vasos':'glasses') + ' 🥤</div>';
+    html += '<div class="water-buttons"><button class="water-btn" data-amount="250">+250ml</button><button class="water-btn" data-amount="500">+500ml</button><button class="water-btn" data-amount="750">+750ml</button></div>';
+    html += '<div class="water-tip">💡 ' + (currentLang==='es'?'Recomendado: peso (kg) × 35ml':'Recommended: weight (kg) × 35ml') + '</div></div>';
     html += '</div>'; container.innerHTML = html;
     var bs = document.getElementById('btnStartJump'); if (bs) bs.addEventListener('click', startJumping);
     var ba = document.getElementById('btnAddJumps'); if (ba) ba.addEventListener('click', addJumps);
@@ -355,6 +364,7 @@ function renderTodayView(container) {
     var bam2 = document.getElementById('btnAppleMusic'); if (bam2) bam2.addEventListener('click', function() { window.open('https://music.apple.com', '_blank'); });
     container.querySelectorAll('.exercise-card').forEach(function(card) { card.querySelector('.exercise-checkbox').addEventListener('click', function() { toggleExercise(card.getAttribute('data-exercise-id')); renderCurrentView(); }); });
     container.querySelectorAll('.exercise-video-btn').forEach(function(btn) { btn.addEventListener('click', function(e) { e.stopPropagation(); let ex = ALL_EXERCISES.find(function(x) { return x.id === btn.getAttribute('data-exercise-id'); }); if (ex) openExerciseModal(ex); }); });
+    container.querySelectorAll('.water-btn').forEach(function(btn) { btn.addEventListener('click', function() { var amount = parseInt(btn.getAttribute('data-amount')); var td = getDayData(today); td.water = (td.water || 0) + amount; appData[today] = td; saveWorkout(); renderCurrentView(); }); });
 }
 
 // === CALENDAR VIEW ===
